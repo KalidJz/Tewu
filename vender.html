@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Productos</title>
+    <link rel="stylesheet" href="Styles/index.css">
+    <link rel="stylesheet" href="Consulta/consultaStyle.css">
+    <link rel="stylesheet" href="Styles/button.css">
+</head>
+<body>
+
+    <script src="/scripts/menu.js"></script>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            
+            <div class="container">
+                <h2>Productos</h2>
+                <table id="productTable">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Descripción</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Agregar</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Productos cargados dinámicamente -->
+                    </tbody>
+                </table>
+                <button class="boton-diseño" onclick="verCarrito()">Ver Carrito</button>
+            </div>
+
+        </div>
+    </div>
+    
+
+    <script>
+        const carrito = [];
+    
+        async function fetchProductos() {
+            try {
+                const response = await fetch('http://localhost:3000/api/productos');
+                const data = await response.json();
+    
+                if (data.success) {
+                    const tableBody = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = '';
+    
+                    data.productos.forEach(producto => {
+                        const row = tableBody.insertRow();
+    
+                        row.innerHTML = `
+                            <td>${producto.nombre_producto}</td>
+                            <td>${producto.descripcion_producto}</td>
+                            <td>${producto.precio_producto}</td>
+                            <td><input type="number" id="cantidad-${producto.id_producto}" value="1" min="1" max="${producto.cantidad_producto}" oninput="validarCantidad(this)"></td>
+                            <td><button onclick="agregarAlCarrito(${producto.id_producto}, '${producto.nombre_producto}', ${producto.precio_producto}, ${producto.cantidad_producto})">Agregar</button></td>
+                        `;
+                    });
+                }
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+            }
+        }
+
+        // Función para validar la cantidad ingresada
+        function validarCantidad(input) {
+            if (parseInt(input.value) <= 0) {
+                alert('La cantidad debe ser mayor a cero');
+                input.value = 1; // Restablece a un valor positivo mínimo
+            }
+        }
+    
+        function agregarAlCarrito(id, nombre, precio, stockDisponible) {
+            const cantidadInput = document.getElementById(`cantidad-${id}`);
+            const cantidad = parseInt(cantidadInput.value);
+    
+            if (cantidad <= 0) {
+                alert('La cantidad debe ser mayor a cero');
+                return;
+            }
+
+            if (cantidad > stockDisponible) {
+                alert(`No puedes agregar más de ${stockDisponible} unidades de este producto.`);
+                cantidadInput.value = stockDisponible; // Ajusta la cantidad al máximo permitido
+                return;
+            }
+    
+            const itemExistente = carrito.find(item => item.id === id);
+            if (itemExistente) {
+                if (itemExistente.cantidad + cantidad > stockDisponible) {
+                    alert(`Ya tienes ${itemExistente.cantidad} unidades en el carrito. No puedes exceder las ${stockDisponible} unidades disponibles.`);
+                    return;
+                }
+                itemExistente.cantidad += cantidad;
+            } else {
+                carrito.push({ id, nombre, precio, cantidad });
+            }
+            alert('Producto agregado al carrito');
+        }
+    
+        function verCarrito() {
+            localStorage.setItem('carrito', JSON.stringify(carrito));
+            window.location.href = 'carrito.html';
+        }
+    
+        document.addEventListener('DOMContentLoaded', fetchProductos);
+    </script>
+    
+</body>
+</html>

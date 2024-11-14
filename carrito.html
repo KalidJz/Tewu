@@ -1,0 +1,119 @@
+<!-- carrito.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Carrito</title>
+    <link rel="stylesheet" href="Styles/index.css">
+    <link rel="stylesheet" href="Consulta/consultaStyle.css">
+    <link rel="stylesheet" href="Styles/button.css">
+</head>
+<body>
+
+    <script src="/scripts/menu.js"></script>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            
+            <div class="container">
+                <h2>Carrito de Compras</h2>
+                <table id="cartTable">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Precio Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Productos en el carrito cargados dinámicamente -->
+                    </tbody>
+                </table>
+                <button class="boton-diseño" onclick="comprar()">Comprar</button>
+                <button class="boton-diseño-red" onclick="cancelar()">Cancelar</button>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Cargar carrito de localStorage o inicializar vacío
+        let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+    
+        // Función para actualizar localStorage y mostrar el carrito en la tabla
+        function actualizarCarrito() {
+            localStorage.setItem('carrito', JSON.stringify(carrito)); // Guardar en localStorage
+    
+            const tableBody = document.getElementById('cartTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Limpiar la tabla
+    
+            carrito.forEach(item => {
+                const row = tableBody.insertRow();
+                row.innerHTML = `
+                    <td>${item.nombre}</td>
+                    <td>${item.cantidad}</td>
+                    <td>${item.precio}</td>
+                    <td>${item.precio * item.cantidad}</td>
+                `;
+            });
+        }
+    
+        // Cargar y mostrar el carrito cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', actualizarCarrito);
+    
+        // Comprar productos en el carrito
+async function comprar() {
+    const id_usuario = 1; // ID de usuario de prueba, ajustar según sea necesario
+    const total = carrito.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+
+    try {
+        const response = await fetch('http://localhost:3000/api/comprar', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ carrito, id_usuario })
+        });
+
+        if (response.ok) {
+            alert('Compra realizada exitosamente');
+            localStorage.setItem('compraRealizada', JSON.stringify({ carrito, total }));
+            localStorage.removeItem('carrito'); // Limpia el carrito
+            carrito = [];
+            actualizarCarrito(); // Refresca la tabla
+
+            // Preguntar si desea generar una factura
+            const deseaFactura = confirm("¿Desea generar una factura para esta compra?");
+            if (deseaFactura) {
+                window.location.href = 'factura.html';
+            } else {
+                alert("Compra completada sin generar factura.");
+                window.location.href = 'vender.html'; // Redirige a otra página si no desea factura
+            }
+        } else {
+            const errorData = await response.json();
+            alert('Error al realizar la compra: ' + (errorData.error || 'Error desconocido'));
+        }
+    } catch (error) {
+        console.error('Error al conectar con el servidor:', error);
+        alert('Hubo un problema al realizar la compra.');
+    }
+}
+
+
+    
+        // Cancelar la compra y limpiar el carrito
+        function cancelar() {
+            if (confirm('¿Estás seguro de que deseas cancelar el carrito?')) {
+                localStorage.removeItem('carrito'); // Limpiar de localStorage
+                carrito = []; // Vaciar el array
+                actualizarCarrito(); // Refrescar la tabla
+                alert('Carrito cancelado');
+                window.location.href = 'vender.html';
+            }
+        }
+    </script>
+    
+</body>
+</html>
