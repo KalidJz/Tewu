@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Categorías</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="../Styles/bajaTable.css">
+</head>
+<body>
+
+    <script src="../scripts/menu2.js"></script>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            <div class="container">
+                <h2>Lista de Categorías</h2>
+                <table id="categoryTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre de la Categoría</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se insertarán las filas de categorías dinámicamente -->
+                    </tbody>
+                </table>
+                <p id="mensaje"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Función para cargar las categorías y mostrarlas en la tabla
+        async function fetchCategorias() {
+            try {
+                const response = await fetch('http://localhost:3000/api/categorias');
+                const data = await response.json();
+
+                if (data.success) {
+                    const tableBody = document.getElementById('categoryTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = ''; // Limpiar cualquier fila previa
+
+                    data.categorias.forEach(categoria => {
+                        const row = tableBody.insertRow();
+
+                        const cellId = row.insertCell();
+                        cellId.textContent = categoria.id_categoria;
+
+                        const cellNombre = row.insertCell();
+                        cellNombre.textContent = categoria.nombre_categoria;
+
+                        const cellActions = row.insertCell();
+                        const deleteButton = document.createElement('button');
+                        deleteButton.textContent = 'Eliminar';
+                        deleteButton.onclick = () => deleteCategoria(categoria.id_categoria);
+                        cellActions.appendChild(deleteButton);
+                    });
+                } else {
+                    document.getElementById('mensaje').textContent = 'Error al obtener las categorías.';
+                }
+            } catch (error) {
+                console.error('Error al cargar las categorías:', error);
+                document.getElementById('mensaje').textContent = 'Error al cargar las categorías.';
+            }
+        }
+
+        // Función para eliminar una categoría
+        async function deleteCategoria(id) {
+            const confirmation = confirm("¿Estás seguro de que deseas eliminar esta categoría?");
+            if (!confirmation) return;
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/categorias/${id}`, {
+                    method: 'DELETE',
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Categoría eliminada correctamente');
+                    fetchCategorias(); // Volver a cargar la lista de categorías
+                } else {
+                    alert('Error al eliminar la categoría: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error al eliminar la categoría:', error);
+                alert('Error al eliminar la categoría.');
+            }
+        }
+
+        // Llamar a la función para cargar las categorías cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', fetchCategorias);
+    </script>
+</body>
+</html>

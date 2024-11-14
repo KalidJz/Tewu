@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Productos</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="ModificarStyle.css">
+</head>
+<body>
+
+    <script src="../scripts/menu2.js"></script>
+
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            
+            <div class="container">
+                <h2>Modificar Categorías</h2>
+                <table id="productTable">
+                    <thead>
+                        <tr>
+                            <th>Categoria</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Las filas de categorías se agregarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+                <p id="mensaje"></p>
+            </div>
+
+            <!-- Formulario de modificación de categoría -->
+            <div class="form-container" id="updateForm">
+                <h3>Modificar Categoria</h3>
+                <label for="nombre_categoria">Nombre de la Categoria:</label>
+                <input type="text" id="nombre_categoria" name="nombre_categoria" required>
+                
+                <button type="button" onclick="confirmUpdate()">Confirmar Modificación</button>
+                <button type="button" class="button-cancel" onclick="cancelUpdate()">Cancelar</button>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        let selectedCategoryId = null;
+
+        // Cargar categorías al cargar la página
+        document.addEventListener('DOMContentLoaded', loadCategories);
+
+        async function loadCategories() {
+            try {
+                const response = await fetch('http://localhost:3000/api/categorias');
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al cargar las categorías.');
+                }
+
+                const categorias = data.categorias; // Ajustar según la respuesta del servidor
+                const tableBody = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = '';
+
+                categorias.forEach(categoria => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${categoria.nombre_categoria}</td>
+                        <td>
+                            <button onclick="showUpdateForm(${categoria.id_categoria}, '${categoria.nombre_categoria}')">Modificar</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error al cargar categorías:', error);
+                document.getElementById('mensaje').textContent = 'Error al cargar categorías.';
+            }
+        }
+
+        function showUpdateForm(id, nombre_categoria) {
+            selectedCategoryId = id;
+            document.getElementById('nombre_categoria').value = nombre_categoria;
+            document.getElementById('updateForm').style.display = 'block'; // Mostrar el formulario
+        }
+
+        async function confirmUpdate() {
+            const confirmation = confirm("¿Estás seguro de que deseas modificar esta categoría?");
+            if (!confirmation) {
+                return;
+            }
+
+            const nombre_categoria = document.getElementById('nombre_categoria').value;
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/categorias/${selectedCategoryId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({nombre_categoria})
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Categoría actualizada correctamente');
+                    loadCategories();
+                    document.getElementById('updateForm').style.display = 'none'; // Ocultar el formulario
+                } else {
+                    alert(result.mensaje);
+                }
+            } catch (error) {
+                console.error('Error al actualizar la categoría:', error);
+                alert('Error al actualizar la categoría.');
+            }
+        }
+
+        // Función para cancelar la modificación y ocultar el formulario
+        function cancelUpdate() {
+            document.getElementById('updateForm').style.display = 'none'; // Ocultar el formulario
+            document.getElementById('nombre_completo').value = ''; // Limpiar los campos
+            document.getElementById('email').value = '';
+            document.getElementById('contrasena').value = '';
+            document.getElementById('rol').value = '';
+        }
+    </script>
+
+</body>
+</html>

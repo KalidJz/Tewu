@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Detalle de Pedidos</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="/Consulta/consultaStyle.css">
+</head>
+<body>
+
+    <script src="../scripts/menu2.js"></script>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            <div class="container">
+                <h2>Detalles de Pedidos</h2>
+                <table id="detallePedidoTable">
+                    <thead>
+                        <tr>
+                            <th>Numero de Pedido</th>
+                            <th>Fecha Pedido</th>
+                            <th>Total Pedido</th>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se insertarán los registros de detalles de pedidos dinámicamente -->
+                    </tbody>
+                </table>
+                <p id="mensaje"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Crear un mapa para almacenar nombres de productos por su ID
+        const productoNombres = {};
+
+        // Función para cargar los productos y llenar el mapa con nombres de productos
+        async function fetchProductos() {
+            try {
+                const response = await fetch('http://localhost:3000/api/productos');
+                const data = await response.json();
+
+                if (data.success) {
+                    data.productos.forEach(producto => {
+                        productoNombres[producto.id_producto] = producto.nombre_producto;
+                    });
+                } else {
+                    console.error('Error al obtener productos');
+                }
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+            }
+        }
+
+        // Función para cargar los detalles de pedidos y mostrarlos en la tabla
+        async function fetchDetallePedidos() {
+            try {
+                const response = await fetch('http://localhost:3000/api/detalle_pedido');
+                const data = await response.json();
+
+                if (data.success) {
+                    const tableBody = document.getElementById('detallePedidoTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = ''; // Limpiar filas previas
+
+                    data.detalles.forEach(detalle => {
+                        const row = tableBody.insertRow();
+
+                        row.innerHTML = `
+                            <td>${detalle.id_pedido}</td>
+                            <td>${new Date(detalle.fecha_pedido).toLocaleDateString()}</td>
+                            <td>$${detalle.total_pedido.toFixed(2)}</td>
+                            <td>${productoNombres[detalle.id_producto] || 'Producto no encontrado'}</td>
+                            <td>${detalle.cantidad}</td>
+                        `;
+                    });
+                } else {
+                    document.getElementById('mensaje').textContent = 'Error al obtener los detalles de pedidos.';
+                }
+            } catch (error) {
+                console.error('Error al cargar detalles de pedidos:', error);
+                document.getElementById('mensaje').textContent = 'Error al cargar detalles de pedidos.';
+            }
+        }
+
+        // Cargar los productos y detalles de pedidos cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchProductos();
+            await fetchDetallePedidos();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Proveedores</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="consultaStyle.css">
+</head>
+<body>
+    <script src="../scripts/menu2.js"></script>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            <div class="container">
+                <h2>Lista de Proveedores</h2>
+                <table id="providerTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre del Proveedor</th>
+                            <th>Teléfono</th>
+                            <th>Dirección</th>
+                            <th>Correo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se insertarán las filas de proveedores dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchProviders() {
+            try {
+                const response = await fetch('http://localhost:3000/api/proveedores'); // Asegúrate de que la ruta sea correcta
+                const data = await response.json();
+
+                if (data.proveedores) { // Cambié la clave a 'proveedores' que es lo que devolverá el servidor
+                    const tableBody = document.getElementById('providerTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = ''; // Limpiar cualquier fila previa
+
+                    data.proveedores.forEach(provider => {
+                        const row = tableBody.insertRow();
+
+                        const cellId = row.insertCell();
+                        cellId.textContent = provider.id_proveedor;
+
+                        const cellName = row.insertCell();
+                        cellName.textContent = provider.nombre_proveedor;
+
+                        const cellPhone = row.insertCell();
+                        cellPhone.textContent = provider.telefono_proveedor;
+
+                        const cellAddress = row.insertCell();
+                        cellAddress.textContent = provider.direccion_proveedor;
+
+                        const cellEmail = row.insertCell();
+                        cellEmail.textContent = provider.correo_proveedor;
+
+                        
+                    });
+                } else {
+                    alert('Error al obtener los proveedores');
+                }
+            } catch (error) {
+                console.error('Error al cargar los proveedores:', error);
+            }
+        }
+
+        // Llamar a la función para cargar proveedores cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', fetchProviders);
+    </script>
+</body>
+</html>

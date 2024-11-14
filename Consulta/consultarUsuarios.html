@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Usuarios</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="consultaStyle.css">
+</head>
+<body>
+
+    <script src="../scripts/menu2.js"></script>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            <div class="container">
+                <h2>Lista de Usuarios</h2>
+                <table id="userTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre Completo</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se insertarán las filas de usuarios dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    
+
+    <script>
+
+        async function fetchUsuarios() {
+            try {
+                const response = await fetch('http://localhost:3000/api/usuarios');
+                const data = await response.json();
+
+                if (data.success) {
+                    const tableBody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = ''; // Limpiar cualquier fila previa
+
+                    data.usuarios.forEach(usuario => {
+                        const row = tableBody.insertRow();
+
+                        const cellId = row.insertCell();
+                        cellId.textContent = usuario.id_usuario;
+
+                        const cellNombre = row.insertCell();
+                        cellNombre.textContent = usuario.nombre_completo;
+
+                        const cellEmail = row.insertCell();
+                        cellEmail.textContent = usuario.email;
+
+                        const cellRol = row.insertCell();
+                        cellRol.textContent = usuario.id_rol;
+                    });
+                } else {
+                    alert('Error al obtener usuarios');
+                }
+            } catch (error) {
+                console.error('Error al cargar usuarios:', error);
+            }
+        }
+
+        // Llamar a la función para cargar usuarios cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', fetchUsuarios);
+    </script>
+</body>
+</html>

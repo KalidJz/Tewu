@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Categorías</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="consultaStyle.css">
+</head>
+<body>
+    <script src="../scripts/menu2.js"></script>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            <div class="container">
+                <h2>Lista de Categorías</h2>
+                <table id="categoryTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre De Categoría</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se insertarán las filas de categorías dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function fetchCategorias() {
+            try {
+                const response = await fetch('http://localhost:3000/api/categorias'); // Usar el endpoint correcto en plural
+                const data = await response.json();
+
+                if (data.success) {
+                    const tableBody = document.getElementById('categoryTable').getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = ''; // Limpiar cualquier fila previa
+
+                    data.categorias.forEach(categoria => {
+                        const row = tableBody.insertRow();
+
+                        const cellId = row.insertCell();
+                        cellId.textContent = categoria.id_categoria;
+
+                        const cellCategoria = row.insertCell();
+                        cellCategoria.textContent = categoria.nombre_categoria;
+                    });
+                } else {
+                    alert('Error al obtener las categorías');
+                }
+            } catch (error) {
+                console.error('Error al cargar las categorías:', error);
+            }
+        }
+
+        // Llamar a la función para cargar categorías cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', fetchCategorias);
+    </script>
+</body>
+</html>

@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Proveedores</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="ModificarStyle.css">
+</head>
+<body>
+
+    <script src="../scripts/menu2.js"></script>
+
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            
+            <div class="container">
+                <h2>Modificar Proveedores</h2>
+                <table id="productTable">
+                    <thead>
+                        <tr>
+                            <th>Proveedor</th>
+                            <th>Telefono</th>
+                            <th>Direccion</th>
+                            <th>Correo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Las filas de proveedores se agregarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+                <p id="mensaje"></p>
+            </div>
+
+            <!-- Formulario de modificación de proveedor -->
+            <div class="form-container" id="updateForm">
+                <h3>Modificar Proveedor</h3>
+                <label for="nombre_proveedor">Nombre del Proveedor:</label>
+                <input type="text" id="nombre_proveedor" name="nombre_proveedor" required>
+
+                <label for="telefono_proveedor">Telefono del Proveedor:</label>
+                <input type="text" id="telefono_proveedor" name="telefono_proveedor" required>
+
+                <label for="direccion">Dirección del Proveedor:</label>
+                <input type="text" id="direccion" name="direccion" required>
+
+                <label for="email">Correo del Proveedor:</label>
+                <input type="email" id="email" name="email" required>
+                
+                <button type="button" onclick="confirmUpdate()">Confirmar Modificación</button>
+                <button type="button" class="button-cancel" onclick="cancelUpdate()">Cancelar</button>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        let selectedProveedorId = null;
+
+        // Cargar proveedores al cargar la página
+        document.addEventListener('DOMContentLoaded', loadProveedores);
+
+        async function loadProveedores() {
+            try {
+                const response = await fetch('http://localhost:3000/api/proveedores');
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al cargar los proveedores.');
+                }
+
+                const proveedores = data.proveedores;
+                const tableBody = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = '';
+
+                proveedores.forEach(proveedor => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${proveedor.nombre_proveedor}</td>
+                        <td>${proveedor.telefono_proveedor}</td>
+                        <td>${proveedor.direccion_proveedor}</td>
+                        <td>${proveedor.correo_proveedor}</td>
+                        <td>
+                            <button onclick="showUpdateForm(${proveedor.id_proveedor}, '${proveedor.nombre_proveedor}', '${proveedor.telefono_proveedor}', '${proveedor.direccion_proveedor}', '${proveedor.correo_proveedor}')">Modificar</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error al cargar proveedores:', error);
+                document.getElementById('mensaje').textContent = 'Error al cargar proveedores.';
+            }
+        }
+
+        function showUpdateForm(id, nombre_proveedor, telefono_proveedor, direccion_proveedor, correo_proveedor) {
+            selectedProveedorId = id;
+            document.getElementById('nombre_proveedor').value = nombre_proveedor;
+            document.getElementById('telefono_proveedor').value = telefono_proveedor;
+            document.getElementById('direccion').value = direccion_proveedor;
+            document.getElementById('email').value = correo_proveedor;
+            document.getElementById('updateForm').style.display = 'block'; // Mostrar el formulario
+        }
+
+        async function confirmUpdate() {
+            const confirmation = confirm("¿Estás seguro de que deseas modificar este proveedor?");
+            if (!confirmation) {
+                return;
+            }
+
+            const nombre_proveedor = document.getElementById('nombre_proveedor').value;
+            const telefono_proveedor = document.getElementById('telefono_proveedor').value;
+            const direccion_proveedor = document.getElementById('direccion').value;
+            const correo_proveedor = document.getElementById('email').value;
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/proveedores/${selectedProveedorId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nombre_proveedor, telefono_proveedor, direccion_proveedor, correo_proveedor })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Proveedor actualizado correctamente');
+                    loadProveedores();
+                    document.getElementById('updateForm').style.display = 'none'; // Ocultar el formulario
+                } else {
+                    alert(result.mensaje);
+                }
+            } catch (error) {
+                console.error('Error al actualizar el proveedor:', error);
+                alert('Error al actualizar el proveedor.');
+            }
+        }
+
+        // Función para cancelar la modificación y ocultar el formulario
+        function cancelUpdate() {
+            document.getElementById('updateForm').style.display = 'none'; // Ocultar el formulario
+            // Limpiar los campos
+            document.getElementById('nombre_proveedor').value = '';
+            document.getElementById('telefono_proveedor').value = '';
+            document.getElementById('direccion').value = '';
+            document.getElementById('email').value = '';
+        }
+    </script>
+
+</body>
+</html>

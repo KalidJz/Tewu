@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baja de Productos</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="../Styles/bajaTable.css">
+</head>
+<body>
+
+    <script src="../scripts/menu2.js"></script>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            <div class="container">
+                <h2>Lista de Productos</h2>
+                <table id="productTable">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Descripcion</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Proveedor</th>
+                            <th>Categoria</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se insertarán las filas de productos dinámicamente -->
+                    </tbody>
+                </table>
+                <p id="mensaje"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let proveedoresMap = {};
+        let categoriasMap = {};
+
+        // Cargar proveedores
+        async function loadProveedores() {
+            try {
+                const response = await fetch('http://localhost:3000/api/proveedores');
+                const data = await response.json();
+
+                if (data.proveedores) {
+                    data.proveedores.forEach(proveedor => {
+                        proveedoresMap[proveedor.id_proveedor] = proveedor.nombre_proveedor;
+                    });
+                } else {
+                    console.error('Error al obtener los proveedores');
+                }
+            } catch (error) {
+                console.error('Error al cargar los proveedores:', error);
+            }
+        }
+
+        // Cargar categorías
+        async function loadCategorias() {
+            try {
+                const response = await fetch('http://localhost:3000/api/categorias');
+                const data = await response.json();
+
+                if (data.categorias) {
+                    data.categorias.forEach(categoria => {
+                        categoriasMap[categoria.id_categoria] = categoria.nombre_categoria;
+                    });
+                } else {
+                    console.error('Error al obtener las categorías');
+                }
+            } catch (error) {
+                console.error('Error al cargar las categorías:', error);
+            }
+        }
+        
+        // Función para cargar los productos y mostrarlos en la tabla
+        async function fetchProductos() {
+            try {
+                const response = await fetch('http://localhost:3000/api/productos'); // Endpoint de consulta de productos
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al cargar los productos.');
+                }
+
+                const productos = data.productos; 
+
+                const tableBody = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = ''; // Limpiar tabla
+
+                productos.forEach(producto => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${producto.nombre_producto}</td>
+                        <td>${producto.descripcion_producto}</td>
+                        <td>${producto.precio_producto}</td>
+                        <td>${producto.cantidad_producto}</td>
+                        <td>${proveedoresMap[producto.id_proveedor] || 'No asignado'}</td>
+                        <td>${categoriasMap[producto.id_categoria] || 'No asignado'}</td>
+                        <td><button onclick="deleteProduct(${producto.id_producto})">Eliminar</button></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+                document.getElementById('mensaje').textContent = 'Error al cargar productos.';
+            }
+        }
+
+        // Función para eliminar un producto
+        async function deleteProduct(id) {
+            const confirmation = confirm("¿Estás seguro de que deseas eliminar este producto?");
+            if (!confirmation) return;
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/productos/${id}`, {
+                    method: 'DELETE',
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Producto eliminado correctamente');
+                    fetchProductos(); // Volver a cargar la lista de productos
+                } else {
+                    alert('Error al eliminar el producto: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error al eliminar producto:', error);
+                alert('Error al eliminar el producto.');
+            }
+        }
+
+        // Cargar proveedores, categorías y productos al cargar la página
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadProveedores();
+            await loadCategorias();
+            fetchProductos();
+        });
+
+    </script>
+</body>
+</html>

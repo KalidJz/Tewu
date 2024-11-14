@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Proveedores</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="../Styles/bajaTable.css">
+</head>
+<body>
+
+    <script src="../scripts/menu2.js"></script>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            <div class="container">
+                <h2>Lista de Proveedores</h2>
+                <table id="userTable">
+                    <thead>
+                        <tr>
+                            <th>Proveedor</th>
+                            <th>Teléfono</th>
+                            <th>Dirección</th>
+                            <th>Correo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Las filas de proveedores se agregarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+                <p id="mensaje"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Cargar proveedores al cargar la página
+        document.addEventListener('DOMContentLoaded', loadProveedor);
+
+        // Función para cargar los proveedores y mostrarlos en la tabla
+        async function loadProveedor() {
+            try {
+                const response = await fetch('http://localhost:3000/api/proveedores'); // Endpoint de consulta de proveedores
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al cargar los proveedores.');
+                }
+
+                const proveedores = data.proveedores; // Ajusta esto según la estructura de tu respuesta
+                const tableBody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = ''; // Limpiar tabla
+  
+                proveedores.forEach(proveedor => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${proveedor.nombre_proveedor}</td>
+                        <td>${proveedor.telefono_proveedor}</td>
+                        <td>${proveedor.direccion_proveedor}</td>
+                        <td>${proveedor.correo_proveedor}</td>
+                        <td><button onclick="deleteProveedor(${proveedor.id_proveedor})">Eliminar</button></td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error al cargar proveedores:', error);
+                document.getElementById('mensaje').textContent = 'Error al cargar proveedores.';
+            }
+        }
+
+        // Función para eliminar un proveedor
+        async function deleteProveedor(id) {
+            // Confirmar antes de eliminar
+            const confirmation = confirm("¿Estás seguro de que deseas eliminar este proveedor?");
+            if (!confirmation) {
+                return; // Si el usuario cancela, no hacer nada
+            }
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/proveedores/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    loadProveedor(); // Recargar la lista de proveedores
+                    document.getElementById('mensaje').textContent = 'Proveedor eliminado correctamente.';
+                    document.getElementById('mensaje').style.color = 'green';
+                } else {
+                    document.getElementById('mensaje').textContent = result.error || 'Error al eliminar el proveedor.';
+                    document.getElementById('mensaje').style.color = 'red';
+                }
+            } catch (error) {
+                console.error('Error al eliminar proveedor:', error);
+                document.getElementById('mensaje').textContent = 'Error al eliminar el proveedor.';
+                document.getElementById('mensaje').style.color = 'red';
+            }
+        }
+    </script>
+
+</body>
+</html>

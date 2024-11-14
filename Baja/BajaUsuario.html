@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Usuarios</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="../Styles/bajaTable.css">
+</head>
+<body>
+
+    <script src="../scripts/menu2.js"></script>
+
+<!-- Contenido principal -->
+<div class="content">
+    <div class="header">Sistema de Control de Inventario</div>
+    <div class="main-content" id="main-content">
+        
+        <div class="container">
+            <h2>Baja de Usuarios</h2>
+            <table id="userTable">
+                <thead>
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Nombre Completo</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Las filas de usuarios se agregarán aquí dinámicamente -->
+                </tbody>
+            </table>
+            <p id="mensaje"></p>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+    let rolesMap = {};
+
+    // Cargar roles y crear el mapa de roles
+    async function loadRoles() {
+        try {
+            const response = await fetch('http://localhost:3000/api/rol');
+            const data = await response.json();
+
+            if (data.success) {
+                data.roles.forEach(rol => {
+                    rolesMap[rol.id_rol] = rol.nombre_rol; // Asocia el ID del rol con su nombre
+                });
+            } else {
+                console.error('Error al obtener los roles');
+            }
+        } catch (error) {
+            console.error('Error al cargar los roles:', error);
+        }
+    }
+
+    // Función para cargar los usuarios y mostrarlos en la tabla
+    async function loadUsers() {
+        try {
+            const response = await fetch('http://localhost:3000/api/usuarios'); // Endpoint de consulta de usuarios
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || 'Error al cargar los usuarios.');
+            }
+
+            const users = data.usuarios;
+            const tableBody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Limpiar tabla
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.cod_usuario}</td>
+                    <td>${user.nombre_completo}</td>
+                    <td>${user.email}</td>
+                    <td>${rolesMap[user.id_rol] || 'No asignado'}</td>
+                    <td><button onclick="deleteUser(${user.id_usuario})">Eliminar</button></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        } catch (error) {
+            console.error('Error al cargar usuarios:', error);
+            document.getElementById('mensaje').textContent = 'Error al cargar usuarios.';
+        }
+    }
+
+    async function deleteUser(id) {
+        const confirmation = confirm("¿Estás seguro de que deseas eliminar este usuario?");
+        if (!confirmation) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://localhost:3000/api/usuarios/${id}`, {
+                method: 'DELETE'
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                loadUsers(); // Recargar la lista de usuarios
+            } else {
+                document.getElementById('mensaje').textContent = result.mensaje;
+            }
+        } catch (error) {
+            console.error('Error al eliminar usuario:', error);
+            document.getElementById('mensaje').textContent = 'Error al eliminar el usuario.';
+        }
+    }
+
+    // Llamar a la función para cargar roles y usuarios cuando la página esté lista
+    document.addEventListener('DOMContentLoaded', async () => {
+        await loadRoles(); // Cargar roles primero
+        loadUsers(); // Luego cargar usuarios para que el rol se muestre correctamente
+    });
+</script>
+
+</body>
+</html>

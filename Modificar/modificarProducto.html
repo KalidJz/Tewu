@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Productos</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="ModificarStyle.css">
+</head>
+<body>
+
+    <script src="../scripts/menu2.js"></script>
+
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            
+            <div class="container">
+                <h2>Modificar Productos</h2>
+                <table id="productTable">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Descripcion</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Proveedor</th>
+                            <th>Categoria</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Las filas de productos se agregarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+                <p id="mensaje"></p>
+            </div>
+
+            <!-- Formulario de modificación de producto -->
+            <div class="form-container" id="updateForm" style="display:none;">
+                <h3>Modificar Producto</h3>
+                <label for="nombre_producto">Nombre del Producto:</label>
+                <input type="text" id="nombre_producto" name="nombre_producto" required>
+                
+                <label for="descripcion_producto">Descripción:</label>
+                <input type="text" id="descripcion_producto" name="descripcion_producto" required>
+
+                <label for="precio_producto">Precio:</label>
+                <input type="number" id="precio_producto" name="precio_producto" required>
+
+                <label for="cantidad_producto">Cantidad:</label>
+                <input type="number" id="cantidad_producto" name="cantidad_producto" required>
+
+                <label for="id_proveedor">Proveedor:</label>
+                <select id="id_proveedor" required>
+                    <option value="" disabled selected>Seleccione un proveedor</option>
+                </select>  
+
+                <label for="id_categoria">Categoria:</label>
+                <select id="id_categoria" required>
+                    <option value="" disabled selected>Selecciona una categoria</option>
+                </select>   
+                
+                <button onclick="confirmUpdate()">Confirmar Modificación</button>
+                <button type="button" class="button-cancel" onclick="cancelUpdate()">Cancelar</button>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        let selectedProductId = null;
+        let proveedoresMap = {};
+        let categoriasMap = {};
+
+        async function loadProveedores() {
+            try {
+                const response = await fetch('http://localhost:3000/api/proveedores');
+                const data = await response.json();
+
+                if (data.proveedores) {
+                    const proveedorSelect = document.getElementById('id_proveedor');
+                    proveedorSelect.innerHTML = '<option value="" disabled selected>Seleccione un proveedor</option>';
+                    
+                    data.proveedores.forEach(proveedor => {
+                        proveedoresMap[proveedor.id_proveedor] = proveedor.nombre_proveedor;
+                        const option = document.createElement('option');
+                        option.value = proveedor.id_proveedor;
+                        option.textContent = proveedor.nombre_proveedor;
+                        proveedorSelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Error al obtener los proveedores');
+                }
+            } catch (error) {
+                console.error('Error al cargar los proveedores:', error);
+            }
+        }
+
+        async function loadCategorias() {
+            try {
+                const response = await fetch('http://localhost:3000/api/categorias');
+                const data = await response.json();
+
+                if (data.categorias) {
+                    const categoriaSelect = document.getElementById('id_categoria');
+                    categoriaSelect.innerHTML = '<option value="" disabled selected>Seleccione una categoria</option>';
+                    
+                    data.categorias.forEach(categoria => {
+                        categoriasMap[categoria.id_categoria] = categoria.nombre_categoria;
+                        const option = document.createElement('option');
+                        option.value = categoria.id_categoria;
+                        option.textContent = categoria.nombre_categoria;
+                        categoriaSelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Error al obtener las categorías');
+                }
+            } catch (error) {
+                console.error('Error al cargar las categorías:', error);
+            }
+        }
+
+        async function loadProducts() {
+            try {
+                const response = await fetch('http://localhost:3000/api/productos');
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al cargar los productos.');
+                }
+
+                const productos = data.productos;
+                const tableBody = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = '';
+
+                productos.forEach(producto => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${producto.nombre_producto}</td>
+                        <td>${producto.descripcion_producto}</td>
+                        <td>${producto.precio_producto}</td>
+                        <td>${producto.cantidad_producto}</td>
+                        <td>${proveedoresMap[producto.id_proveedor] || 'No asignado'}</td>
+                        <td>${categoriasMap[producto.id_categoria] || 'No asignado'}</td>
+                        <td>
+                            <button onclick="showUpdateForm(${producto.id_producto}, '${producto.nombre_producto}', '${producto.descripcion_producto}', ${producto.precio_producto}, ${producto.cantidad_producto}, '${producto.id_proveedor}', '${producto.id_categoria}')">Modificar</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+                document.getElementById('mensaje').textContent = 'Error al cargar productos.';
+            }
+        }
+
+        function showUpdateForm(id, nombre_producto, descripcion_producto, precio_producto, cantidad_producto, id_proveedor, id_categoria) {
+            selectedProductId = id;
+            document.getElementById('nombre_producto').value = nombre_producto;
+            document.getElementById('descripcion_producto').value = descripcion_producto;
+            document.getElementById('precio_producto').value = precio_producto;
+            document.getElementById('cantidad_producto').value = cantidad_producto;
+            document.getElementById('id_proveedor').value = id_proveedor;
+            document.getElementById('id_categoria').value = id_categoria;
+            document.getElementById('updateForm').style.display = 'block';
+        }
+
+        async function confirmUpdate() {
+            const confirmation = confirm("¿Estás seguro de que deseas modificar este producto?");
+            if (!confirmation) return;
+
+            const nombre_producto = document.getElementById('nombre_producto').value;
+            const descripcion_producto = document.getElementById('descripcion_producto').value;
+            const precio_producto = document.getElementById('precio_producto').value;
+            const cantidad_producto = document.getElementById('cantidad_producto').value;
+            const id_proveedor = document.getElementById('id_proveedor').value;
+            const id_categoria = document.getElementById('id_categoria').value;
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/productos/${selectedProductId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nombre_producto, descripcion_producto, precio_producto, cantidad_producto, id_proveedor, id_categoria })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Producto actualizado correctamente');
+                    loadProducts();
+                    document.getElementById('updateForm').style.display = 'none';
+                } else {
+                    alert(result.mensaje);
+                }
+            } catch (error) {
+                console.error('Error al actualizar producto:', error);
+                alert('Error al actualizar el producto.');
+            }
+        }
+
+        function cancelUpdate() {
+            document.getElementById('updateForm').style.display = 'none';
+            document.getElementById('nombre_producto').value = '';
+            document.getElementById('descripcion_producto').value = '';
+            document.getElementById('precio_producto').value = '';
+            document.getElementById('cantidad_producto').value = '';
+            document.getElementById('id_proveedor').value = '';
+            document.getElementById('id_categoria').value = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadProveedores();
+            await loadCategorias();
+            loadProducts();
+        });
+    </script>
+
+</body>
+</html>

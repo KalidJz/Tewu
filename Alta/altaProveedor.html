@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Alta de Proveedor</title>
+  <link rel="stylesheet" href="../Styles/index.css">
+  <link rel="stylesheet" href="FormularioStyle.css">
+</head>
+<body>
+
+  <script src="/scripts/menu2.js"></script>
+
+  <!-- Contenido principal -->
+  <div class="content">
+    <div class="header">Sistema de Control de Inventario</div>
+    <div class="main-content" id="main-content">
+      <div class="product-form">
+        <h2>Alta de Proveedor</h2>
+        <form id="formAltaProveedor">
+          <input type="text" id="nombre" placeholder="Nombre del Proveedor" required>
+          <input type="text" id="telefono" placeholder="Teléfono" required>
+          <input type="text" id="direccion" placeholder="Dirección" required>
+          <input type="email" id="email" placeholder="Correo" required>
+          <button type="submit">Dar de Alta</button>
+        </form>
+        <p id="mensaje"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('formAltaProveedor').addEventListener('submit', async (e) => {
+        e.preventDefault(); // Evitar el envío tradicional del formulario
+    
+        // Capturar los valores de los campos del formulario
+        const nombre_proveedor = document.getElementById('nombre').value;
+        const telefono_proveedor = document.getElementById('telefono').value;
+        const direccion_proveedor = document.getElementById('direccion').value;
+        const correo_proveedor = document.getElementById('email').value;
+        const mensaje = document.getElementById('mensaje'); // Elemento para mostrar mensajes
+    
+        try {
+            // Enviar los datos al servidor usando fetch
+            const response = await fetch('http://localhost:3000/api/proveedores', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ nombre_proveedor, telefono_proveedor, direccion_proveedor, correo_proveedor })
+            });
+    
+            const data = await response.json();
+    
+            // Verificar si la respuesta fue exitosa
+            if (response.ok) {
+                mensaje.textContent = 'Proveedor registrado correctamente';
+                mensaje.style.color = 'green';
+                // Limpiar el formulario después de un registro exitoso
+                document.getElementById('formAltaProveedor').reset();
+            } else {
+                // Mostrar el error que envía el servidor
+                mensaje.textContent = 'Error al registrar el Proveedor: ' + (data.error || 'Error desconocido');
+                mensaje.style.color = 'red';
+            }
+        } catch (error) {
+            // Manejo de errores de la solicitud
+            console.error('Error:', error);
+            mensaje.textContent = 'Error de conexión. Intenta nuevamente.';
+            mensaje.style.color = 'red';
+        }
+    });
+  </script>
+
+</body>
+</html>
