@@ -1,0 +1,80 @@
+/* Reset de márgenes y padding */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* Fondo de la página */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #2e2e2e;
+}
+
+/* Estilos para el contenedor de login */
+.login-container {
+  background-color: #ffffff;
+  width: 300px;
+  padding: 20px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+/* Título del formulario */
+.login-container h2 {
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Campos de entrada */
+.login-container input[type="text"],
+.login-container input[type="password"] {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+/* Botones */
+.login-container button {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* Estilos del botón Entrar */
+.login-container .btn-entrar {
+  background-color: #007bff;
+  color: #fff;
+  margin-top: 10px;
+}
+
+/* Estilos del botón Salir */
+.login-container .btn-salir {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+/* Enlace para recuperar contraseña */
+.login-container a {
+  display: inline-block;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.login-container a:hover {
+  text-decoration: underline;
+}

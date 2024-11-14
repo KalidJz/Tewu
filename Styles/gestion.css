@@ -1,0 +1,44 @@
+.main-content {
+    min-height: 300px;
+    padding: 20px;
+}
+
+a{
+    text-decoration: none;
+    color: white;
+}
+
+button {
+    background-color: #000000;
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin: 5px;
+    display: inline-block; /* Asegúrate de que los botones son elementos en línea */
+    text-align: center; /* Centrar el texto dentro de los botones */
+}
+.button-container {
+display: flex; /* Usar Flexbox para centrar los elementos */
+justify-content: center; /* Centrar horizontalmente */
+flex-wrap: wrap; /* Permitir que los botones se ajusten en varias líneas si es necesario */
+margin-top: 20px; /* Espacio superior para separar del texto */
+}
+
+button:hover {
+    background-color: rgb(1, 23, 100);
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    .content {
+        margin-left: 0;
+    }
+}

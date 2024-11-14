@@ -1,0 +1,32 @@
+.boton-diseño{
+    margin-top: 20px;
+    width: 22%;
+    padding: 10px 20px;
+    background-color: rgb(69, 160, 73);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    
+}
+.boton-diseño:hover {
+    background-color: rgb(69, 131, 73);
+}
+
+.boton-diseño-red{
+    margin-top: 20px;
+    width: 22%;
+    padding: 10px 20px;
+    background-color: rgb(176, 40, 40);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    
+}
+
+.boton-diseño-red:hover {
+    background-color: rgb(176, 10, 40);
+}
