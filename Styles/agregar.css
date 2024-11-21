@@ -1,0 +1,157 @@
+body{
+    background-color: white;
+}
+
+/* Menu */
+
+.menu{
+    background-color: rgb(221, 114, 14);
+    display: block;
+    text-align: center;
+    padding: 20px 20px;
+
+
+}
+.menu a{
+    font-family:'Segoe UI';
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: 600;
+    padding-left: 90px;
+    padding-right: 90px;
+    
+}
+
+
+/* Formulario */
+
+.formulario-general h2{
+    font-size: 30px;
+    font-family:'Segoe UI';
+    text-align: center;
+}
+.formulario{
+    font-family:'Segoe UI';
+    text-align: center;
+}
+.formulario fieldset{
+    margin: 0 auto;
+    padding-bottom: 200px;
+    border-radius: 10px;
+    border: none;
+
+}
+.formulario label{
+    text-align: left;
+    padding-right: 220px;
+}
+.campo{
+    width: 20%;
+    padding: 10px;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+.boton-diseño{
+    margin-top: 20px;
+    width: 22%;
+    padding: 10px 20px;
+    background-color: rgb(69, 160, 73);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    
+}
+
+
+:root{
+    --main-color:#fff;
+  }
+  
+  *{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+  
+  body{
+    font-family:'Roboto' , 'sans-serif';
+    overflow:hidden;
+  }
+  
+  .main-header{
+    background: #4FB391;
+    width: 100%;
+    height:50px;
+  }
+
+  .titulo{
+    
+  }
+  
+  nav{
+    position: absolute;
+    left:0;
+    top:0;
+    width: 200px;
+    top:50px;
+    height:calc(100vh - 50px);
+    background:#2D6653;
+    transform:translateX(-100%);
+    transition:.4s ease;
+  }
+  
+  .navigation li{
+    list-style:none;
+    width: 100%;
+    border-bottom: 1px solid rgba(255,255,255,.5);
+  }
+  
+  .navigation a{
+    color:var(--main-color);
+    display: block;
+    line-height:3.5;
+    padding: 0 10px;
+    text-decoration:none;
+    transition:.4s ease;
+  }
+  
+  .navigation a:hover{
+    transform:translateX(10%);
+  }
+  
+  #btn-nav{
+    display: none;
+  }
+  
+  #btn-nav:checked ~ nav{
+    transform:translateX(0);
+  }
+  
+  .btn-nav{
+    color:var(--main-color);
+    font-size:30px;
+    position: absolute;
+    left:0;
+    top:0;
+    cursor:pointer;
+    padding:6.5px 15px;
+    transition:.2s ease;
+    background:rgba(0,0,0,.1);
+  }
+  
+  .btn-nav:hover{
+    background:rgba(0,0,0,.3);
+  }
+
+
+
+  /* Footer */
+
+  .footer{
+    background-color: #4FB391;
+  }

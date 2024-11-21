@@ -1,0 +1,133 @@
+/* Estilos generales */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f9; /* Fondo general */
+    color: #333;
+    display: flex;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+/* Estilos del menú lateral */
+.sidebar {
+    width: 250px;
+    background-color: #090909; /* Negro para contraste */
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    transition: all 0.3s ease;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}
+.sidebar h1 {
+    font-size: 24px;
+    color: #f4f6f9;
+    text-align: center;
+    margin-bottom: 30px;
+}
+.sidebar p {
+    font-size: 13px;
+    color: #f4f6f9;
+    text-align: center;
+    margin-top: 274px;
+    font-weight: 500;
+}
+.menu {
+    list-style: none;
+    padding: 0;
+}
+.menu li {
+    width: 100%;
+}
+.menu li a {
+    display: block;
+    padding: 15px 20px;
+    color: #f4f6f9;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background 0.3s, padding-left 0.3s, border-left 0.3s;
+    border-left: 3px solid transparent;
+}
+.menu li a:hover {
+    background-color: #282828;
+    padding-left: 25px;
+    border-left: 3px solid #5A768D; /* Gris azulado */
+}
+.menu li a.active {
+    background-color: #032040; /* Azul oscuro */
+    padding-left: 25px;
+    color: #fff;
+}
+
+/* Estilo del contenido principal */
+.content {
+    margin-left: 250px;
+    padding: 20px;
+    flex: 1;
+}
+.header {
+    background-color: #090909; /* Negro */
+    padding: 15px;
+    color: #f4f6f9;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+}
+.main-content {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+    padding: 20px;
+    min-height: 300px;
+}
+p {
+    font-size: 16px;
+    color: #333;
+}
+
+/* Estilos de botones */
+button {
+    background-color: #4b8673; /* Verde oscuro */
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+button:hover {
+    background-color: #3b6d5a; /* Versión más oscura */
+}
+
+/* Estilos de responsividad */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+    }
+    .content {
+        margin-left: 200px;
+    }
+}
+@media screen and (max-width: 480px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    .content {
+        margin-left: 0;
+    }
+}

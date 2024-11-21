@@ -1,0 +1,56 @@
+.boton-diseño{
+    margin-top: 20px;
+    width: 22%;
+    padding: 10px 20px;
+    background-color: rgb(69, 160, 73);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    
+}
+.boton-diseño:hover {
+    background-color: rgb(69, 131, 73);
+}
+
+
+/* Estilo para el botón "Agregar" */
+.boton-diseño2 {
+    background-color: #1a9fcb; /* Color verde para destacar */
+    color: white;
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.boton-diseño2:hover {
+    background-color: #217588; /* Color verde más oscuro cuando se pasa el mouse */
+    transform: translateY(-2px);
+}
+
+.boton-diseño2:active {
+    background-color: #1e5e7e; /* Color verde aún más oscuro cuando se presiona */
+    transform: translateY(2px);
+}
+
+.boton-diseño-red{
+    margin-top: 20px;
+    width: 22%;
+    padding: 10px 20px;
+    background-color: rgb(176, 40, 40);
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    
+}
+
+.boton-diseño-red:hover {
+    background-color: rgb(176, 10, 40);
+}

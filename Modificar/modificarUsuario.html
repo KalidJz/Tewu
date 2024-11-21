@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Usuarios</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="ModificarStyle.css">
+    <link rel="stylesheet" href="../Styles/busquedastyle.css">
+</head>
+<body>
+
+    <script src="../scripts/menu2.js"></script>
+
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            
+            <div class="container">
+                <h2>Modificar Usuarios</h2><br>
+
+                <!-- Controles de búsqueda -->
+                <div class="search-container">
+                    <label for="searchType">Buscar por:</label>
+                    <select id="searchType">
+                        <option value="nombre_completo">Nombre</option>
+                        <option value="email">Correo</option>
+                        <option value="id_rol">Rol</option>
+                    </select>
+                    <input type="text" id="searchInput" placeholder="Ingrese el término de búsqueda">
+                    <button class="busqueda-button" onclick="searchUsers()">Buscar</button>
+                </div>
+
+                <table id="userTable">
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Nombre Completo</th>
+                            <th>Correo</th>
+                            <th>Rol</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Las filas de usuarios se agregarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+                <p id="mensaje"></p>
+            </div>
+
+            <!-- Formulario de modificación de usuario -->
+            <div class="form-container" id="updateForm" style="display: none;">
+                <h3>Modificar Usuario</h3>
+                <label for="nombre_completo">Nombre Completo:</label>
+                <input type="text" id="nombre_completo" name="nombre_completo" required>
+                
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="contrasena">Contraseña:</label>
+                <input type="text" id="contrasena" name="contrasena" required>
+
+                <label for="rol">Rol:</label>
+                <select class="product-form" id="rol" required>
+                    <option value="" disabled selected>Seleccione un Rol</option>
+                </select>    
+                
+                <button onclick="confirmUpdate()">Confirmar Modificación</button>
+                <button type="button" class="button-cancel" onclick="cancelUpdate()">Cancelar</button>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        let selectedUserId = null;
+        let rolesMap = {};
+        let users = [];  // Para almacenar la lista de usuarios
+
+        // Cargar roles
+        async function loadRoles() {
+            try {
+                const response = await fetch('http://localhost:3000/api/rol');
+                const data = await response.json();
+
+                if (data.success) {
+                    const rolSelect = document.getElementById('rol');
+                    data.roles.forEach(rol => {
+                        rolesMap[rol.id_rol] = rol.nombre_rol; // Mapa para asociar IDs con nombres
+                        const option = document.createElement('option');
+                        option.value = rol.id_rol; // El valor que se enviará al backend
+                        option.textContent = rol.nombre_rol; // Nombre que se mostrará en el select
+                        rolSelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Error al obtener los roles');
+                }
+            } catch (error) {
+                console.error('Error al cargar los roles:', error);
+            }
+        }
+
+        // Cargar usuarios al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            loadRoles();
+            loadUsers();
+        });
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('http://localhost:3000/api/usuarios');
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al cargar los usuarios.');
+                }
+
+                users = data.usuarios;
+                renderUserTable(users); // Renderizar la tabla de usuarios
+            } catch (error) {
+                console.error('Error al cargar usuarios:', error);
+                document.getElementById('mensaje').textContent = 'Error al cargar usuarios.';
+            }
+        }
+
+        function renderUserTable(users) {
+            const tableBody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Limpiar cualquier fila previa
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.cod_usuario}</td>
+                    <td>${user.nombre_completo}</td>
+                    <td>${user.email}</td>
+                    <td>${rolesMap[user.id_rol] || 'No asignado'}</td> <!-- Mostrar el nombre del rol -->
+                    <td>
+                        <button onclick="showUpdateForm(${user.id_usuario}, '${user.nombre_completo}', '${user.email}', '${user.contrasena}', '${user.id_rol}')">Modificar</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Función para realizar la búsqueda de usuarios
+        function searchUsers() {
+            const searchType = document.getElementById('searchType').value; // Tipo de búsqueda
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+
+            const filteredUsers = users.filter(user => {
+                if (searchType === 'id_rol') {
+                    // Comparar por rol usando el nombre
+                    return rolesMap[user.id_rol]?.toLowerCase().includes(searchInput);
+                } else if (searchType === 'cod_usuario') {
+                    // Buscar por codigo de usuario
+                    return user.cod_usuario.toLowerCase().includes(searchInput);
+                }
+                return user[searchType]?.toLowerCase().includes(searchInput);
+            });
+
+            renderUserTable(filteredUsers); // Mostrar los usuarios filtrados
+        }
+
+        function showUpdateForm(id, nombre_completo, email, contrasena, rol) {
+            selectedUserId = id;
+            document.getElementById('nombre_completo').value = nombre_completo;
+            document.getElementById('email').value = email;
+            document.getElementById('contrasena').value = contrasena;
+            document.getElementById('rol').value = rol;
+            document.getElementById('updateForm').style.display = 'block';
+        }
+
+        async function confirmUpdate() {
+            const confirmation = confirm("¿Estás seguro de que deseas modificar este usuario?");
+            if (!confirmation) return;
+
+            const nombre_completo = document.getElementById('nombre_completo').value;
+            const email = document.getElementById('email').value;
+            const contrasena = document.getElementById('contrasena').value;
+            const rol = document.getElementById('rol').value;
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/usuarios/${selectedUserId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nombre_completo, email, contrasena, rol })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Usuario actualizado correctamente');
+                    loadUsers(); // Recargar la lista de usuarios
+                    document.getElementById('updateForm').style.display = 'none';
+                } else {
+                    alert(result.mensaje);
+                }
+            } catch (error) {
+                console.error('Error al actualizar usuario:', error);
+                alert('Error al actualizar el usuario.');
+            }
+        }
+
+        // Función para cancelar la modificación y ocultar el formulario
+        function cancelUpdate() {
+            document.getElementById('updateForm').style.display = 'none';
+            document.getElementById('nombre_completo').value = '';
+            document.getElementById('email').value = '';
+            document.getElementById('contrasena').value = '';
+            document.getElementById('rol').value = '';
+        }
+    </script>
+
+</body>
+</html>

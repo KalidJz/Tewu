@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Usuarios</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="consultaStyle.css">
+    <link rel="stylesheet" href="../Styles/busquedastyle.css">
+</head>
+<body>
+
+    <script src="../scripts/menu2.js"></script>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            <div class="container">
+                <h2>Lista de Usuarios</h2><br>
+
+                <!-- Controles de búsqueda -->
+                <div class="search-container">
+                    <label for="searchType">Buscar por:</label>
+                    <select id="searchType">
+                        <option value="nombre_completo">Nombre</option>
+                        <option value="email">Correo</option>
+                        <option value="id_rol">Rol</option>
+                    </select>
+                    <input type="text" id="searchInput" placeholder="Ingrese el término de búsqueda">
+                    <button class="busqueda-button" onclick="searchUsuarios()">Buscar</button>
+                </div>
+
+                <table id="userTable">
+                    <thead>
+                        <tr>
+                            <th>Codigo De Usuario</th>
+                            <th>Nombre Completo</th>
+                            <th>Email</th>
+                            <th>Rol</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se insertarán las filas de usuarios dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let usuarios = [];  // Almacenamos la lista de usuarios
+        let rolesMap = {};   // Mapa de roles con id_rol como clave y nombre_rol como valor
+
+        // Función para cargar los roles desde la API
+        async function loadRoles() {
+            try {
+                const response = await fetch('http://localhost:3000/api/rol');
+                const data = await response.json();
+
+                if (data.success) {
+                    data.roles.forEach(rol => {
+                        rolesMap[rol.id_rol] = rol.nombre_rol; // Asocia el ID del rol con su nombre
+                    });
+                } else {
+                    console.error('Error al obtener los roles');
+                }
+            } catch (error) {
+                console.error('Error al cargar los roles:', error);
+            }
+        }
+
+        // Función para cargar los usuarios desde la API
+        async function fetchUsuarios() {
+            try {
+                const response = await fetch('http://localhost:3000/api/usuarios');
+                const data = await response.json();
+
+                if (data.success) {
+                    usuarios = data.usuarios;
+                    mostrarUsuarios(usuarios); // Mostrar todos los usuarios al cargar
+                } else {
+                    alert('Error al obtener usuarios');
+                }
+            } catch (error) {
+                console.error('Error al cargar usuarios:', error);
+            }
+        }
+
+        // Función para mostrar los usuarios en la tabla
+        function mostrarUsuarios(usuariosList) {
+            const tableBody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Limpiar cualquier fila previa
+
+            usuariosList.forEach(usuario => {
+                const row = tableBody.insertRow();
+
+                const cellId = row.insertCell();
+                cellId.textContent = usuario.cod_usuario;
+
+                const cellNombre = row.insertCell();
+                cellNombre.textContent = usuario.nombre_completo;
+
+                const cellEmail = row.insertCell();
+                cellEmail.textContent = usuario.email;
+
+                const cellRol = row.insertCell();
+                cellRol.textContent = rolesMap[usuario.id_rol] || usuario.id_rol; // Mostrar nombre del rol
+            });
+        }
+
+        // Buscar usuarios según el tipo de búsqueda
+        function searchUsuarios() {
+            const searchType = document.getElementById('searchType').value; // Tipo de búsqueda
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+
+            const usuariosFiltrados = usuarios.filter(usuario => {
+                if (searchType === 'id_rol') {
+                    // Comparar roles (se necesita un número para id_rol)
+                    return rolesMap[usuario.id_rol]?.toLowerCase().includes(searchInput);
+                } else if (searchType === 'cod_usuario') {
+                    // Buscar por codigo de usuario
+                    return usuario.cod_usuario.toLowerCase().includes(searchInput);
+                }
+                return usuario[searchType]?.toLowerCase().includes(searchInput);
+            });
+
+            mostrarUsuarios(usuariosFiltrados); // Mostrar los usuarios filtrados
+        }
+
+        // Llamar a la función para cargar roles y usuarios cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadRoles();  // Cargar los roles primero
+            await fetchUsuarios();  // Luego cargar los usuarios
+        });
+    </script>
+
+</body>
+</html>

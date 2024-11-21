@@ -1,0 +1,110 @@
+/* Reset de márgenes y padding */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+/* Fondo de la página */
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #161620;
+  font-size: 16px;
+}
+
+/* Estilos para el contenedor de login */
+.login-container {
+  background-color: #ffffff;
+  width: 100%;
+  max-width: 400px;
+  padding: 40px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.login-container:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Título del formulario */
+.login-container h2 {
+  margin-bottom: 20px;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* Campos de entrada */
+.login-container input[type="text"],
+.login-container input[type="password"] {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #f9f9f9;
+  transition: border-color 0.3s;
+}
+
+.login-container input[type="text"]:focus,
+.login-container input[type="password"]:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* Botones */
+.login-container button {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Estilos del botón Entrar */
+.login-container .btn-entrar {
+  background-color: #007bff;
+  color: #fff;
+  font-weight: 600;
+}
+
+.login-container .btn-entrar:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+/* Estilos del botón Salir */
+.login-container .btn-salir {
+  background-color: #6c757d;
+  color: #fff;
+  font-weight: 600;
+}
+
+.login-container .btn-salir:hover {
+  background-color: #5a6268;
+  transform: translateY(-2px);
+}
+
+/* Enlace para recuperar contraseña */
+.login-container a {
+  display: inline-block;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #007bff;
+  text-decoration: none;
+}
+
+.login-container a:hover {
+  text-decoration: underline;
+}

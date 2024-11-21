@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Control de Inventario - TEWU</title>
+    <link rel="stylesheet" href="Styles/index.css">
+    <style>
+        .low-stock {
+            color: red;
+            font-weight: bold;
+        }
+        #productTable, #ventasTable {
+            display: none; /* Oculta las tablas inicialmente */
+        }
+        input {
+            width: 100%;
+            text-align: center;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+    <link rel="stylesheet" href="/Consulta/consultaStyle.css">
+</head>
+<body>
+
+    <script src="/scripts/menu.js"></script>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            <h2>Información de Inventario</h2>
+
+            <!-- Tabla para productos con bajo stock -->
+            <table id="productTable">
+                <thead>
+                    <tr>
+                        <th>Acción</th>
+                        <th>Producto</th>
+                        <th>Descripción</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Los productos se cargarán aquí dinámicamente -->
+                </tbody>
+            </table> <br>
+
+            <h2>Registro de Ventas</h2>
+            <label for="fecha">Seleccione una fecha:</label>
+            <input type="date" id="fecha" onchange="fetchVentas()">
+            
+            <!-- Tabla para mostrar ventas del día seleccionado -->
+            <table id="ventasTable">
+                <thead>
+                    <tr>
+                        <th>ID Pedido</th>
+                        <th>Fecha Pedido</th>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Total Pedido</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Las ventas se cargarán aquí dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Función para cargar productos con cantidad 0
+        async function fetchProductos() {
+            try {
+                const response = await fetch('http://localhost:3000/api/productos');
+                const data = await response.json();
+
+                if (data.success) {
+                    const table = document.getElementById('productTable');
+                    const tableBody = table.getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = '';
+
+                    let hasLowStock = false;
+
+                    data.productos.forEach(producto => {
+                        if (producto.cantidad_producto === 0) {
+                            hasLowStock = true;
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>Necesita ReStock</td>
+                                <td>${producto.nombre_producto}</td>
+                                <td>${producto.descripcion_producto}</td>
+                                <td>${producto.precio_producto}</td>
+                                <td class="low-stock">${producto.cantidad_producto}</td>
+                            `;
+                            tableBody.appendChild(row);
+                        }
+                    });
+
+                    // Mostrar la tabla solo si hay productos con cantidad 0
+                    if (hasLowStock) {
+                        table.style.display = 'table';
+                    }
+                }
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+            }
+        }
+
+        // Función para cargar ventas de un día seleccionado
+        async function fetchVentas() {
+            const fecha = document.getElementById('fecha').value;
+            if (!fecha) return; // No hacer nada si no se ha seleccionado una fecha
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/ventas?fecha=${fecha}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const ventasTable = document.getElementById('ventasTable');
+                    const tableBody = ventasTable.getElementsByTagName('tbody')[0];
+                    tableBody.innerHTML = '';
+
+                    if (data.ventas.length > 0) {
+                        data.ventas.forEach(venta => {
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${venta.id_pedido}</td>
+                                <td>${new Date(venta.fecha_pedido).toLocaleDateString()}</td>
+                                <td>${venta.nombre_producto}</td>
+                                <td>${venta.cantidad}</td>
+                                <td>$${venta.total_pedido.toFixed(2)}</td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                        ventasTable.style.display = 'table';
+                    } else {
+                        ventasTable.style.display = 'none';
+                        alert('No hay ventas registradas para esta fecha.');
+                    }
+                } else {
+                    document.getElementById('mensaje').textContent = 'Error al obtener las ventas.';
+                }
+            } catch (error) {
+                console.error('Error al cargar ventas:', error);
+                document.getElementById('mensaje').textContent = 'Error al cargar ventas.';
+            }
+        }
+
+        // Cargar productos y mostrar si tienen bajo stock
+        document.addEventListener('DOMContentLoaded', fetchProductos);
+    </script>
+</body>
+</html>

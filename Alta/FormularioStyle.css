@@ -1,0 +1,107 @@
+.product-form {
+    max-width: 400px; /* Limitar el ancho del formulario */
+    margin: 20px auto; /* Centrar el formulario */
+    padding: 20px; /* Espaciado interno */
+    border: 1px solid #ddd; /* Borde suave */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra más definida */
+    background-color: #ffffff; /* Fondo blanco puro */
+    font-family: 'Arial', sans-serif; /* Fuente profesional */
+}
+
+/* Título */
+.product-form h2 {
+    text-align: center; /* Centrar el título */
+    color: #1a2a52; /* Azul oscuro profesional */
+    font-size: 24px; /* Tamaño del título */
+    margin-bottom: 20px; /* Espacio inferior */
+    text-transform: uppercase; /* Convertir texto a mayúsculas */
+    font-weight: bold; /* Negrita */
+}
+
+/* Campos de entrada y selector */
+.product-form input[type="text"],
+.product-form input[type="email"],
+.product-form input[type="password"],
+.product-form input[type="number"],
+.product-form select {
+    width: 100%; /* Ancho completo */
+    padding: 12px; /* Más espacio interno */
+    margin-bottom: 15px; /* Separación entre campos */
+    border: 1px solid #ccc; /* Borde del campo */
+    border-radius: 6px; /* Bordes ligeramente redondeados */
+    font-size: 16px; /* Tamaño de fuente */
+    transition: border-color 0.3s, box-shadow 0.3s; /* Transición para enfoque */
+    background-color: #f8f8f8; /* Fondo sutil */
+}
+
+/* Enfoque en campos */
+.product-form input[type="text"]:focus,
+.product-form input[type="email"]:focus,
+.product-form input[type="password"]:focus,
+.product-form input[type="number"]:focus,
+.product-form select:focus {
+    border-color: #4b8673; /* Verde profesional */
+    box-shadow: 0 0 6px rgba(75, 134, 115, 0.5); /* Sombra de foco */
+    outline: none; /* Eliminar borde predeterminado */
+    background-color: #ffffff; /* Fondo blanco al enfocarse */
+}
+
+/* Botón */
+.product-form button {
+    width: 100%; /* Ancho completo */
+    padding: 12px; /* Espaciado interno */
+    background-color: #4b8673; /* Verde profesional */
+    color: white; /* Texto blanco */
+    border: none; /* Sin borde */
+    border-radius: 6px; /* Bordes redondeados */
+    font-size: 16px; /* Tamaño de fuente */
+    font-weight: bold; /* Negrita */
+    cursor: pointer; /* Cursor de mano */
+    transition: background-color 0.3s, transform 0.2s; /* Transiciones suaves */
+    text-transform: uppercase; /* Texto en mayúsculas */
+}
+
+.product-form button:hover {
+    background-color: #3b6d5a; /* Verde más oscuro al pasar el ratón */
+    transform: translateY(-2px); /* Efecto de levitación */
+}
+
+/* Mensaje */
+#mensaje {
+    text-align: center; /* Centrar mensaje */
+    margin-top: 15px; /* Margen superior */
+    font-size: 14px; /* Tamaño del texto */
+    font-weight: bold; /* Negrita */
+    color: #e74c3c; /* Rojo suave para mensajes */
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .product-form {
+        padding: 15px; /* Reducir padding en pantallas pequeñas */
+    }
+
+    .product-form h2 {
+        font-size: 20px; /* Reducir tamaño del título */
+    }
+
+    .product-form button {
+        font-size: 14px; /* Texto más pequeño en pantallas pequeñas */
+    }
+}
+
+@media (max-width: 480px) {
+    .product-form {
+        margin: 10px; /* Reducir márgenes en dispositivos muy pequeños */
+    }
+
+    .product-form input[type="text"],
+    .product-form input[type="email"],
+    .product-form input[type="password"],
+    .product-form input[type="number"],
+    .product-form select {
+        padding: 10px; /* Ajustar padding */
+        font-size: 14px; /* Texto más pequeño */
+    }
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Alta de Categoría</title>
+  <link rel="stylesheet" href="../Styles/index.css">
+  <link rel="stylesheet" href="FormularioStyle.css">
+</head>
+<body>
+
+  <!-- Menú lateral -->
+  <script src="/scripts/menu2.js"></script>
+
+<!-- Contenido principal -->
+<div class="content">
+  <div class="header">Sistema de Control de Inventario</div>
+  <div class="main-content" id="main-content">
+    <div class="product-form">
+      <h2>Alta de Categoría</h2>
+      <form id="formAltaCategoria">
+        <input type="text" id="categoria" placeholder="Nombre de la categoría" required>
+        <button type="submit">Dar de Alta</button>
+      </form>
+      <p id="mensaje"></p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
+
+<script>
+  document.getElementById('formAltaCategoria').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      // Obtener el valor del campo de categoría
+      const nombre_categoria = document.getElementById('categoria').value;
+
+      try {
+          const response = await fetch('http://localhost:3000/api/categorias', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ nombre_categoria })
+          });
+
+          const data = await response.json();
+          const mensaje = document.getElementById('mensaje');
+
+          if (response.ok) {
+              mensaje.textContent = 'Categoría registrada correctamente';
+              mensaje.style.color = 'green';
+              document.getElementById('formAltaCategoria').reset();
+          } else {
+              mensaje.textContent = 'Error al registrar la categoría: ' + data.error;
+              mensaje.style.color = 'red';
+          }
+      } catch (error) {
+          console.error('Error:', error);
+          mensaje.textContent = 'Error de conexión. Inténtalo de nuevo.';
+          mensaje.style.color = 'red';
+      }
+  });
+</script>

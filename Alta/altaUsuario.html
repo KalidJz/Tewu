@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Alta de Usuario</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="FormularioStyle.css">
+</head>
+<body>
+    <script src="/scripts/menu2.js"></script>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            <div class="product-form">
+                <h2>Alta de Usuario</h2>
+                <form id="formAltaUsuario">
+                    <!-- Campo de código de usuario como solo lectura -->
+                    <input type="text" id="codUsuario" placeholder="Código de Usuario" readonly>
+                    <input type="text" id="nombre" placeholder="Nombre" required>
+                    <input type="email" id="email" placeholder="Email" required>
+                    <input type="password" id="contrasena" placeholder="Contraseña" required>
+                    <select id="rol" required>
+                        <option value="" disabled selected>Seleccione un Rol</option>
+                    </select>     
+                    <button type="submit">Dar de Alta</button>
+                </form>
+                <p id="mensaje"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const rolSelect = document.getElementById('rol');
+            const codUsuarioInput = document.getElementById('codUsuario');
+            const mensaje = document.getElementById('mensaje');
+
+            try {
+                // Cargar roles
+                const rolResponse = await fetch('http://localhost:3000/api/rol');
+                const rolData = await rolResponse.json();
+
+                if (rolData.success) {
+                    rolData.roles.forEach(rol => {
+                        const option = document.createElement('option');
+                        option.value = rol.id_rol;
+                        option.textContent = rol.nombre_rol;
+                        rolSelect.appendChild(option);
+                    });
+                } else {
+                    mensaje.textContent = 'Error al cargar los roles.';
+                    mensaje.style.color = 'red';
+                }
+
+                // Obtener el siguiente código de usuario
+                const codUsuarioResponse = await fetch('http://localhost:3000/api/usuarios/lastCodUsuario');
+                const codUsuarioData = await codUsuarioResponse.json();
+
+                if (codUsuarioData.success && codUsuarioData.lastCodUsuario !== undefined) {
+                    codUsuarioInput.value = codUsuarioData.lastCodUsuario + 1;
+                } else {
+                    mensaje.textContent = 'Error al obtener el código de usuario.';
+                    mensaje.style.color = 'red';
+                }
+            } catch (error) {
+                mensaje.textContent = 'Error al cargar datos iniciales.';
+                mensaje.style.color = 'red';
+                console.error('Error al cargar datos iniciales:', error);
+            }
+        });
+
+        document.getElementById('formAltaUsuario').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const codUsuario = document.getElementById('codUsuario').value;
+            const nombre = document.getElementById('nombre').value;
+            const email = document.getElementById('email').value;
+            const contrasena = document.getElementById('contrasena').value;
+            const rol = document.getElementById('rol').value;
+            const mensaje = document.getElementById('mensaje');
+
+            try {
+                const response = await fetch('http://localhost:3000/api/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ codUsuario, nombre, email, contrasena, rol })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    mensaje.textContent = 'Usuario registrado correctamente.';
+                    mensaje.style.color = 'green';
+                    document.getElementById('formAltaUsuario').reset();
+                    document.getElementById('codUsuario').value = parseInt(codUsuario) + 1; // Actualiza el código de usuario
+                } else {
+                    mensaje.textContent = 'Error al registrar el usuario: ' + (data.error || 'Error desconocido');
+                    mensaje.style.color = 'red';
+                }
+            } catch (error) {
+                mensaje.textContent = 'Error de conexión. Intenta nuevamente.';
+                mensaje.style.color = 'red';
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+
+        .search-container input[type="text"]{
+            width: 50%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .search-container select{
+            width: 25%;
+            padding: 7px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .busqueda-button {
+            width: 10%; /* Ancho completo */
+            padding: 8px; /* Espaciado interno */
+            background-color: #4b8673; /* Color de fondo */
+            color: white; /* Color del texto */
+            border: none; /* Sin borde */
+            border-radius: 4px; /* Bordes redondeados */
+            font-size: 12px; /* Tamaño de fuente */
+            cursor: pointer; /* Cambiar cursor al pasar el ratón */
+            transition: background 0.3s; /* Transición suave */
+        }
+
+        .busqueda-button:hover {
+            background-color: #3b6d5a; /* Color de fondo al pasar el ratón */
+        }

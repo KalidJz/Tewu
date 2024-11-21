@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Productos</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="ModificarStyle.css">
+    <link rel="stylesheet" href="../Styles/busquedastyle.css">
+</head>
+<body>
+
+    <script src="../scripts/menu2.js"></script>
+
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            
+            <div class="container">
+                <h2>Modificar Productos</h2><br>
+
+                <!-- Controles de búsqueda -->
+                <div class="search-container">
+                    <label for="searchType">Buscar por:</label>
+                    <select id="searchType">
+                        <option value="nombre">Nombre del Producto</option>
+                        <option value="precio">Precio</option>
+                        <option value="cantidad">Cantidad</option>
+                        <option value="proveedor">Proveedor</option>
+                        <option value="categoria">Categoría</option>
+                    </select>
+                    <input type="text" id="searchInput" class="busqueda" placeholder="Ingresa el término de búsqueda">
+                    <button class="busqueda-button" onclick="searchProductos()">Buscar</button>
+                </div>
+
+                <table id="productTable">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Descripcion</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Proveedor</th>
+                            <th>Categoria</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Las filas de productos se agregarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+                <p id="mensaje"></p>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let proveedoresMap = {};
+        let categoriasMap = {};
+        let productos = []; // Variable para almacenar los productos
+
+        async function loadProveedores() {
+        try {
+            const response = await fetch('http://localhost:3000/api/proveedores');
+            const data = await response.json();
+            console.log("Proveedores:", data);  // Verifica que los proveedores sean correctos
+
+            if (data.proveedores) {
+                proveedoresMap = {};
+                data.proveedores.forEach(proveedor => {
+                    proveedoresMap[proveedor.id_proveedor] = proveedor.nombre_proveedor;
+                });
+            } else {
+                console.error('Error al obtener los proveedores');
+            }
+        } catch (error) {
+            console.error('Error al cargar los proveedores:', error);
+        }
+    }
+
+    async function loadCategorias() {
+        try {
+            const response = await fetch('http://localhost:3000/api/categorias');
+            const data = await response.json();
+            console.log("Categorías:", data);  // Verifica que las categorías sean correctas
+
+            if (data.categorias) {
+                categoriasMap = {};
+                data.categorias.forEach(categoria => {
+                    categoriasMap[categoria.id_categoria] = categoria.nombre_categoria;
+                });
+            } else {
+                console.error('Error al obtener las categorías');
+            }
+        } catch (error) {
+            console.error('Error al cargar las categorías:', error);
+        }
+    }
+    
+
+
+        async function loadProducts() {
+            try {
+                const response = await fetch('http://localhost:3000/api/productos');
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al cargar los productos.');
+                }
+
+                productos = data.productos; // Guardamos los productos en la variable
+                const tableBody = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+                tableBody.innerHTML = '';
+
+                productos.forEach(producto => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><input type="text" value="${producto.nombre_producto}" class="editable" data-field="nombre_producto" disabled></td>
+                    <td><input type="text" value="${producto.descripcion_producto}" class="editable" data-field="descripcion_producto" disabled></td>
+                    <td><input type="number" value="${producto.precio_producto}" class="editable" data-field="precio_producto" disabled></td>
+                    <td><input type="number" value="${producto.cantidad_producto}" class="editable" data-field="cantidad_producto" disabled></td>
+                    <td>
+                        <select class="editable" data-field="id_proveedor" disabled data-original="${producto.id_proveedor}">
+                            ${Object.keys(proveedoresMap).map(id => 
+                                `<option value="${id}" ${String(id) === String(producto.id_proveedor) ? 'selected' : ''}>${proveedoresMap[id]}</option>`
+                            ).join('')}
+                        </select>
+                    </td>
+                    <td>
+                        <select class="editable" data-field="id_categoria" disabled data-original="${producto.id_categoria}">
+                            ${Object.keys(categoriasMap).map(id => 
+                                `<option value="${id}" ${String(id) === String(producto.id_categoria) ? 'selected' : ''}>${categoriasMap[id]}</option>`
+                            ).join('')}
+                        </select>
+                    </td>
+                    <td>
+                        <button onclick="toggleEdit(${producto.id_producto}, this)">Modificar</button>
+                        <button class="cancel-button" style="display:none;" onclick="cancelEdit(${producto.id_producto}, this)">Cancelar</button>
+                        <button class="save-button" style="display:none;" onclick="saveProductChanges(${producto.id_producto}, this)">Guardar</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+                document.getElementById('mensaje').textContent = 'Error al cargar productos.';
+            }
+        }
+
+        function toggleEdit(productId, button) {
+            const row = button.closest('tr');
+            const inputs = row.querySelectorAll('.editable');
+            const modifyButton = row.querySelector('button');
+            const cancelButton = row.querySelector('.cancel-button');
+            const saveButton = row.querySelector('.save-button');
+
+            // Habilitar/deshabilitar campos de entrada
+            inputs.forEach(input => input.disabled = !input.disabled);
+            cancelButton.style.display = 'inline';
+            saveButton.style.display = 'inline';
+            modifyButton.style.display = 'none';
+        }
+
+        function cancelEdit(productId, button) {
+        const row = button.closest('tr');
+        const inputs = row.querySelectorAll('.editable');
+        const modifyButton = row.querySelector('button');
+        const cancelButton = row.querySelector('.cancel-button');
+        const saveButton = row.querySelector('.save-button');
+
+        // Restablecer los valores a los originales
+        inputs.forEach(input => {
+            input.disabled = true;
+            if (input.tagName === 'SELECT') {
+                const originalValue = input.getAttribute('data-original');
+                input.value = originalValue; // Restablecer el valor original
+            } else {
+                input.value = input.getAttribute('data-original') || input.value; // revertir a los valores originales
+            }
+        });
+
+        cancelButton.style.display = 'none';
+        saveButton.style.display = 'none';
+        modifyButton.style.display = 'inline';
+    }
+
+
+        async function saveProductChanges(productId, button) {
+            const row = button.closest('tr');
+            const fields = row.getElementsByClassName('editable');
+            const updatedProduct = {};
+
+            Array.from(fields).forEach(field => {
+                updatedProduct[field.getAttribute('data-field')] = field.value;
+            });
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/productos/${productId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedProduct)
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Producto actualizado correctamente');
+                    loadProducts();
+                } else {
+                    alert(result.mensaje);
+                }
+            } catch (error) {
+                console.error('Error al actualizar producto:', error);
+                alert('Error al actualizar el producto.');
+            }
+        }
+
+        // Función para filtrar los productos según el término de búsqueda
+        function searchProductos() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const searchType = document.getElementById('searchType').value;
+
+        // Filtrar productos según el criterio de búsqueda seleccionado
+        const filteredProducts = productos.filter(producto => {
+            switch (searchType) {
+                case 'nombre':
+                    return producto.nombre_producto.toLowerCase().includes(searchTerm);
+                case 'precio':
+                    return producto.precio_producto.toString().includes(searchTerm);
+                case 'cantidad':
+                    return producto.cantidad_producto.toString().includes(searchTerm);
+                case 'proveedor':
+                    return proveedoresMap[producto.id_proveedor].toLowerCase().includes(searchTerm);
+                case 'categoria':
+                    return categoriasMap[producto.id_categoria].toLowerCase().includes(searchTerm);
+                default:
+                    return false;
+            }
+        });
+
+        // Mostrar los productos filtrados
+        const tableBody = document.getElementById('productTable').getElementsByTagName('tbody')[0];
+        tableBody.innerHTML = '';  // Limpiar la tabla antes de agregar las filas
+
+        filteredProducts.forEach(producto => {
+            const row = document.createElement('tr');
+
+            // Crear las filas de la tabla con las opciones correctas de proveedor y categoría
+            row.innerHTML = `
+                <td><input type="text" value="${producto.nombre_producto}" class="editable" data-field="nombre_producto" disabled></td>
+                <td><input type="text" value="${producto.descripcion_producto}" class="editable" data-field="descripcion_producto" disabled></td>
+                <td><input type="number" value="${producto.precio_producto}" class="editable" data-field="precio_producto" disabled></td>
+                <td><input type="number" value="${producto.cantidad_producto}" class="editable" data-field="cantidad_producto" disabled></td>
+                <td>
+                    <select class="editable" data-field="id_proveedor" disabled>
+                        ${Object.keys(proveedoresMap).map(id => 
+                            `<option value="${id}" ${id == producto.id_proveedor ? 'selected' : ''}>${proveedoresMap[id]}</option>`
+                        ).join('')}
+                    </select>
+                </td>
+                <td>
+                    <select class="editable" data-field="id_categoria" disabled>
+                        ${Object.keys(categoriasMap).map(id => 
+                            `<option value="${id}" ${id == producto.id_categoria ? 'selected' : ''}>${categoriasMap[id]}</option>`
+                        ).join('')}
+                    </select>
+                </td>
+                <td>
+                    <button onclick="toggleEdit(${producto.id_producto}, this)">Modificar</button>
+                    <button class="cancel-button" style="display:none;" onclick="cancelEdit(${producto.id_producto}, this)">Cancelar</button>
+                    <button class="save-button" style="display:none;" onclick="saveProductChanges(${producto.id_producto}, this)">Guardar</button>
+                </td>
+            `;
+
+            // Agregar la fila a la tabla
+            tableBody.appendChild(row);
+        });
+    }
+
+
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadProveedores();
+            await loadCategorias();
+            loadProducts();
+        });
+    </script>
+
+</body>
+</html>

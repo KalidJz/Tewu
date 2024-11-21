@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultar Productos</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="consultaStyle.css">
+    <link rel="stylesheet" href="../Styles/busquedastyle.css">
+</head>
+<body>
+
+    <script src="../scripts/menu2.js"></script>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            <div class="container">
+                <h2>Lista de Productos</h2> <br>
+                
+                <!-- Controles de búsqueda -->
+                <div class="search-container">
+                    <label for="searchType">Buscar por:</label>
+                    <select id="searchType">
+                        <option value="nombre">Nombre del Producto</option>
+                        <option value="precio">Precio</option>
+                        <option value="cantidad">Cantidad</option>
+                        <option value="proveedor">Proveedor</option>
+                        <option value="categoria">Categoría</option>
+                    </select>
+                    <input type="text" id="searchInput" placeholder="Ingresa el término de búsqueda">
+                    <button class="busqueda-button" onclick="searchProductos()">Buscar</button>
+                </div>
+
+                <table id="userTable">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Descripción</th>
+                            <th>Precio</th>
+                            <th>Cantidad</th>
+                            <th>Proveedor</th>
+                            <th>Categoría</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Aquí se insertarán las filas de productos dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let proveedoresMap = {};
+        let categoriasMap = {};
+        let productos = []; // Almacena todos los productos para la búsqueda
+
+        // Cargar proveedores
+        async function loadProveedores() {
+            try {
+                const response = await fetch('http://localhost:3000/api/proveedores');
+                const data = await response.json();
+
+                if (data.proveedores) {
+                    data.proveedores.forEach(proveedor => {
+                        proveedoresMap[proveedor.id_proveedor] = proveedor.nombre_proveedor;
+                    });
+                } else {
+                    console.error('Error al obtener los proveedores');
+                }
+            } catch (error) {
+                console.error('Error al cargar los proveedores:', error);
+            }
+        }
+
+        // Cargar categorías
+        async function loadCategorias() {
+            try {
+                const response = await fetch('http://localhost:3000/api/categorias');
+                const data = await response.json();
+
+                if (data.categorias) {
+                    data.categorias.forEach(categoria => {
+                        categoriasMap[categoria.id_categoria] = categoria.nombre_categoria;
+                    });
+                } else {
+                    console.error('Error al obtener las categorías');
+                }
+            } catch (error) {
+                console.error('Error al cargar las categorías:', error);
+            }
+        }
+
+        // Cargar productos
+        async function fetchProductos() {
+            try {
+                const response = await fetch('http://localhost:3000/api/productos');
+                const data = await response.json();
+
+                if (data.success) {
+                    productos = data.productos; // Guardar los productos en memoria
+                    mostrarProductos(productos); // Mostrar todos los productos
+                } else {
+                    alert('Error al obtener productos');
+                }
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+            }
+        }
+
+        // Mostrar productos en la tabla
+        function mostrarProductos(productosFiltrados) {
+            const tableBody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Limpiar cualquier fila previa
+
+            productosFiltrados.forEach(producto => {
+                const row = tableBody.insertRow();
+
+                const cellNombre = row.insertCell();
+                cellNombre.textContent = producto.nombre_producto;
+
+                const cellDescripcion = row.insertCell();
+                cellDescripcion.textContent = producto.descripcion_producto;
+
+                const cellPrecio = row.insertCell();
+                cellPrecio.textContent = producto.precio_producto;
+
+                const cellCantidad = row.insertCell();
+                cellCantidad.textContent = producto.cantidad_producto;
+
+                const cellProveedor = row.insertCell();
+                cellProveedor.textContent = proveedoresMap[producto.id_proveedor] || 'Proveedor desconocido';
+
+                const cellCategoria = row.insertCell();
+                cellCategoria.textContent = categoriasMap[producto.id_categoria] || 'Categoría desconocida';
+            });
+        }
+
+        // Buscar productos según el criterio seleccionado
+        function searchProductos() {
+            const searchType = document.getElementById('searchType').value;
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+
+            // Filtrar los productos según el tipo de búsqueda y el término ingresado
+            const productosFiltrados = productos.filter(producto => {
+                switch (searchType) {
+                    case 'nombre':
+                        return producto.nombre_producto.toLowerCase().includes(searchInput);
+                    case 'precio':
+                        return producto.precio_producto.toString().includes(searchInput);
+                    case 'cantidad':
+                        return producto.cantidad_producto.toString().includes(searchInput);
+                    case 'proveedor':
+                        return (proveedoresMap[producto.id_proveedor] || '').toLowerCase().includes(searchInput);
+                    case 'categoria':
+                        return (categoriasMap[producto.id_categoria] || '').toLowerCase().includes(searchInput);
+                    default:
+                        return false;
+                }
+            });
+
+            // Mostrar los productos filtrados
+            mostrarProductos(productosFiltrados);
+        }
+
+        // Cargar proveedores, categorías y productos cuando la página esté lista
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadProveedores();
+            await loadCategorias();
+            await fetchProductos();
+        });
+    </script>
+</body>
+</html>

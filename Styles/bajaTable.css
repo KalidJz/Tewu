@@ -1,0 +1,102 @@
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9; /* Fondo claro para contraste */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}
+
+h2 {
+    text-align: center;
+    color: #1a2a52; /* Azul oscuro */
+    font-family: 'Arial', sans-serif;
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-transform: uppercase; /* Dar un estilo más profesional */
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-family: 'Arial', sans-serif;
+    background-color: #ffffff; /* Fondo blanco */
+    border-radius: 8px; /* Bordes redondeados */
+    overflow: hidden; /* Para respetar el borde redondeado */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}
+
+table th,
+table td {
+    padding: 12px 15px; /* Más espacio interno */
+    text-align: left;
+}
+
+th {
+    background-color: #1a2a52; /* Azul oscuro */
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase; /* Mayúsculas */
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2; /* Gris claro para filas pares */
+}
+
+tr:hover {
+    background-color: #d6e0f5; /* Azul suave al pasar el ratón */
+    transition: background-color 0.3s ease; /* Suavidad en el cambio */
+}
+
+td {
+    color: #333; /* Texto gris oscuro */
+    font-size: 14px;
+}
+
+.button-delete {
+    background-color: #c0392b; /* Rojo fuerte */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.button-delete:hover {
+    background-color: #e74c3c; /* Rojo más claro al pasar el ratón */
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 15px; /* Reducir espacio en pantallas pequeñas */
+    }
+
+    table th, 
+    table td {
+        font-size: 14px; /* Ajuste del texto */
+        padding: 10px 12px; /* Espaciado reducido */
+    }
+
+    h2 {
+        font-size: 18px; /* Reducir el tamaño del título */
+    }
+}
+
+@media (max-width: 480px) {
+    table, th, td {
+        display: block; /* Apilar elementos en pantallas muy pequeñas */
+        width: 100%;
+    }
+
+    tr {
+        margin-bottom: 10px; /* Separación entre filas */
+        display: block; /* Apilar filas */
+    }
+
+    th {
+        text-align: center; /* Centrar encabezados */
+    }
+}

@@ -1,0 +1,161 @@
+/* ModificarStyle.css */
+
+/* Contenedor Principal */
+.container {
+    max-width: 1800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9; /* Fondo claro */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}
+
+/* Encabezado */
+h2 {
+    text-align: center;
+    color: #1a2a52; /* Azul oscuro */
+    font-family: 'Arial', sans-serif;
+    font-size: 24px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+/* Tabla */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    font-family: 'Arial', sans-serif;
+    background-color: #ffffff; /* Fondo blanco */
+    border-radius: 8px;
+    overflow: hidden; /* Bordes redondeados */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}
+
+table th,
+table td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+th {
+    background-color: #1a2a52; /* Azul oscuro */
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2; /* Gris claro para filas pares */
+}
+
+tr:hover {
+    background-color: #d6e0f5; /* Azul claro al pasar el ratón */
+    transition: background-color 0.3s ease; /* Transición suave */
+}
+
+td {
+    color: #333; /* Gris oscuro */
+    font-size: 14px;
+}
+
+/* Botones */
+button {
+    background-color: #2980b9; /* Azul fuerte */
+    color: white;
+    border: none;
+    padding: 8px 12px; /* Tamaño uniforme */
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background-color: #3498db; /* Azul más claro al pasar el ratón */
+}
+
+button.modify-button {
+    background-color: #ff9800; /* Naranja para modificar */
+}
+
+button.modify-button:hover {
+    background-color: #e68900;
+}
+
+button.save-button {
+    background-color: #27ae60; /* Verde para guardar */
+    display: none;
+}
+
+button.save-button:hover {
+    background-color: #2ecc71;
+}
+
+button.cancel-button {
+    background-color: #ab2020; /* Rojo para cancelar */
+    display: none;
+}
+
+button.cancel-button:hover {
+    background-color: #e74c3c;
+}
+
+button.button-cancel {
+    background-color: #ab2020;
+}
+
+button.button-cancel:hover {
+    background-color: #e74c3c;
+}
+
+/* Formulario */
+.form-container {
+    display: none;
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}
+
+.form-container label {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #333;
+}
+
+.form-container input,
+.form-container select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fafafa; /* Fondo suave */
+    font-size: 14px;
+    transition: border-color 0.3s, background-color 0.3s ease;
+}
+
+.form-container input:focus,
+.form-container select:focus {
+    border-color: #2980b9; /* Azul fuerte */
+    background-color: #f0f8ff; /* Fondo más claro al enfocar */
+    outline: none;
+}
+
+.form-container input::placeholder,
+.form-container select::placeholder {
+    color: #888; /* Gris claro */
+}
+
+/* Mensaje */
+#mensaje {
+    text-align: center;
+    margin-top: 2rem;
+    color: #ff5722; /* Naranja vibrante */
+    font-size: 16px;
+}

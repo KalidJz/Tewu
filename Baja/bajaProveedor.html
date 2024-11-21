@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eliminar Proveedores</title>
+    <link rel="stylesheet" href="../Styles/index.css">
+    <link rel="stylesheet" href="../Styles/bajaTable.css">
+    <link rel="stylesheet" href="../Styles/busquedastyle.css">
+</head>
+<body>
+
+    <script src="../scripts/menu2.js"></script>
+
+    <!-- Contenido principal -->
+    <div class="content">
+        <div class="header">Sistema de Control de Inventario</div>
+        <div class="main-content" id="main-content">
+            <div class="container">
+                <h2>Baja de Proveedores</h2><br>
+
+                <!-- Contenedor de búsqueda -->
+                <div class="search-container">
+                    <label for="searchType">Buscar por:</label>
+                    <select id="searchType">
+                        <option value="nombre_proveedor">Nombre del Proveedor</option>
+                        <option value="telefono_proveedor">Teléfono</option>
+                        <option value="direccion_proveedor">Dirección</option>
+                        <option value="correo_proveedor">Correo</option>
+                    </select>
+                    <input type="text" id="searchInput" placeholder="Ingrese el término de búsqueda">
+                    <button class="busqueda-button" onclick="searchProveedores()">Buscar</button>
+                </div>
+
+                <table id="userTable">
+                    <thead>
+                        <tr>
+                            <th>Proveedor</th>
+                            <th>Teléfono</th>
+                            <th>Dirección</th>
+                            <th>Correo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Las filas de proveedores se agregarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+                <p id="mensaje"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let proveedores = []; // Variable global para almacenar los proveedores
+
+        // Cargar proveedores al cargar la página
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadProveedores();
+        });
+
+        // Función para cargar los proveedores y mostrarlos en la tabla
+        async function loadProveedores() {
+            try {
+                const response = await fetch('http://localhost:3000/api/proveedores');
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al cargar los proveedores.');
+                }
+
+                proveedores = data.proveedores; // Guardar en la variable global
+                mostrarProveedores(proveedores); // Mostrar todos los proveedores inicialmente
+            } catch (error) {
+                console.error('Error al cargar proveedores:', error);
+                document.getElementById('mensaje').textContent = 'Error al cargar proveedores.';
+            }
+        }
+
+        // Función para mostrar proveedores en la tabla
+        function mostrarProveedores(proveedoresFiltrados) {
+            const tableBody = document.getElementById('userTable').getElementsByTagName('tbody')[0];
+            tableBody.innerHTML = ''; // Limpiar tabla
+
+            proveedoresFiltrados.forEach(proveedor => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${proveedor.nombre_proveedor}</td>
+                    <td>${proveedor.telefono_proveedor}</td>
+                    <td>${proveedor.direccion_proveedor}</td>
+                    <td>${proveedor.correo_proveedor}</td>
+                    <td><button class="button-delete" onclick="deleteProveedor(${proveedor.id_proveedor})">Eliminar</button></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Función para eliminar un proveedor
+        async function deleteProveedor(id) {
+            const confirmation = confirm("¿Estás seguro de que deseas eliminar este proveedor?");
+            if (!confirmation) return;
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/proveedores/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    alert('Proveedor eliminado correctamente');
+                    loadProveedores(); // Recargar la lista de proveedores
+                } else {
+                    alert('Error al eliminar el proveedor: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error al eliminar proveedor:', error);
+                alert('Error al eliminar el proveedor.');
+            }
+        }
+
+        // Función para buscar proveedores
+        function searchProveedores() {
+            const searchType = document.getElementById('searchType').value; // Tipo de búsqueda
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+
+            const proveedoresFiltrados = proveedores.filter(proveedor =>
+                proveedor[searchType]?.toLowerCase().includes(searchInput)
+            );
+
+            mostrarProveedores(proveedoresFiltrados);
+        }
+    </script>
+
+</body>
+</html>

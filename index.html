@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inicio de Sesión</title>
+  <link rel="stylesheet" href="Styles/iniciosesion.css">
+</head>
+<body>
+
+  <div class="login-container">
+    <h2>Inicio de Sesión</h2>
+    <form id="formUsuario">
+      <input type="text" placeholder="Usuario" id="Usuario" required>
+      <input type="password" placeholder="Contraseña" id="contrasena" required>
+      <button type="submit" class="btn-entrar">Entrar</button>
+      <button type="button" class="btn-salir">Salir</button>
+      <a href="#">¿Olvidaste tu contraseña?</a>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById('formUsuario').addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  const usuario = document.getElementById('Usuario').value;
+  const contrasena = document.getElementById('contrasena').value;
+
+  const loginButton = document.querySelector('.btn-entrar');
+  loginButton.textContent = "Cargando..."; // Cambiar texto al hacer clic
+  loginButton.disabled = true; // Deshabilitar el botón mientras se procesa la solicitud
+
+  try {
+    const response = await fetch('http://localhost:3000/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({usuario, contrasena}),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+
+      // Agregar un console.log aquí para ver la respuesta
+      console.log("Respuesta del servidor:", data);
+
+      if (data.success) {
+        localStorage.setItem('nombreUsuario', data.nombre_completo); // Ahora deberías recibir el nombre completo correctamente
+        localStorage.setItem('id_usuario', data.id_usuario); // Guardar id_usuario también en el localStorage
+        localStorage.setItem('id_rol', data.id_rol); // Guarda el id_rol
+        if (data.id_rol === 1) {
+          window.location.href = "gestion.html";
+        } else if (data.id_rol === 2) {
+          window.location.href = "gestion.html";
+        }
+      } else {
+        alert("Nombre de usuario o contraseña incorrectos.");
+      }
+    } else {
+      alert("Error al intentar iniciar sesión. Inténtalo de nuevo.");
+    }
+  } catch (error) {
+    console.error('Error al conectar con el servidor:', error);
+    alert("Hubo un problema al conectar con el servidor.");
+  } finally {
+    loginButton.textContent = "Entrar"; // Restaurar texto
+    loginButton.disabled = false; // Habilitar nuevamente el botón
+  }
+});
+
+
+  </script>
+</body>
+</html>

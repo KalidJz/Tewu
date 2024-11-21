@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Alta de Productos</title>
+  <link rel="stylesheet" href="../Styles/index.css">
+  <link rel="stylesheet" href="FormularioStyle.css">
+</head>
+<body>
+
+  <script src="/scripts/menu2.js"></script>
+
+<!-- Contenido principal -->
+<div class="content">
+  <div class="header">Sistema de Control de Inventario</div>
+  <div class="main-content" id="main-content">
+    <div class="product-form">
+      <h2>Alta de Producto</h2>
+      <form id="formAltaProducto">
+        <input type="text" id="nombre" placeholder="Nombre del Producto" required>
+        <input type="text" id="descripcion" placeholder="Descripción" required>
+        <input type="number" id="precio" placeholder="Precio" min="1" required>
+        <select id="proveedor" required>
+          <option value="" disabled selected>Seleccione un proveedor</option>
+        </select>        
+        <input type="number" id="cantidad" placeholder="Cantidad" min="1" required>
+        <select id="categoria" required>
+          <option value="" disabled selected>Selecciona una categoria</option>
+        </select>   
+        <button type="submit">Dar de Alta</button>
+      </form>
+      <p id="mensaje"></p>
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>
+
+<script src="../scripts/Validacion.js"></script>
+<script>
+
+
+  // Aplicar validación en los campos
+  document.getElementById('nombre').addEventListener('input', validarCaracteresPermitidos);
+  document.getElementById('descripcion').addEventListener('input', validarCaracteresPermitidos);
+
+
+  // Cargar los proveedores cuando la página esté lista
+  document.addEventListener('DOMContentLoaded', async () => {
+    // Cargar proveedores
+    try {
+        const response = await fetch('http://localhost:3000/api/proveedores'); // Cambia la ruta según sea necesario
+        const data = await response.json();
+
+        if (data.proveedores) {
+            const proveedorSelect = document.getElementById('proveedor');
+            
+            data.proveedores.forEach(proveedor => {
+                const option = document.createElement('option');
+                option.value = proveedor.id_proveedor; // Este será el valor enviado al backend
+                option.textContent = proveedor.nombre_proveedor; // Nombre que se mostrará en el select
+                proveedorSelect.appendChild(option);
+            });
+        } else {
+            console.error('Error al obtener los proveedores');
+        }
+    } catch (error) {
+        console.error('Error al cargar los proveedores:', error);
+    }
+
+    // Cargar categorías
+    try {
+        const response = await fetch('http://localhost:3000/api/categorias'); // Cambia la ruta según sea necesario
+        const data = await response.json();
+
+        if (data.categorias) { // Verifica que 'categorias' es el nombre correcto en la respuesta
+            const categoriaSelect = document.getElementById('categoria');
+            
+            data.categorias.forEach(categoria => { // Cambia 'proveedor' por 'categoria' para evitar confusiones
+                const option = document.createElement('option');
+                option.value = categoria.id_categoria; // Este será el valor enviado al backend
+                option.textContent = categoria.nombre_categoria; // Nombre que se mostrará en el select
+                categoriaSelect.appendChild(option);
+            });
+        } else {
+            console.error('Error al obtener las categorías');
+        }
+    } catch (error) {
+        console.error('Error al cargar las categorías:', error);
+    }
+});
+
+  
+
+  // Manejo del envío del formulario
+  document.getElementById('formAltaProducto').addEventListener('submit', async (e) => {
+      e.preventDefault();  // Evitar que el formulario se envíe de la forma tradicional
+
+      // Obtener los valores de los campos
+      const nombre = document.getElementById('nombre').value;
+      const descripcion = document.getElementById('descripcion').value;
+      const precio = parseFloat(document.getElementById('precio').value); // Convertir a número
+      const cantidad = parseInt(document.getElementById('cantidad').value); // Convertir a número
+      const proveedor = parseInt(document.getElementById('proveedor').value); // ID del proveedor seleccionado
+      const categoria = parseInt(document.getElementById('categoria').value); // Convertir a número
+
+      try {
+          const response = await fetch('http://localhost:3000/api/productos', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ nombre, descripcion, precio, cantidad, proveedor, categoria })
+          });
+
+          const data = await response.json();
+          const mensaje = document.getElementById('mensaje');
+
+          if (response.ok) {
+              mensaje.textContent = 'Producto registrado correctamente';
+              mensaje.style.color = 'green';
+              document.getElementById('formAltaProducto').reset();
+          } else {
+              mensaje.textContent = 'Error al registrar el producto: ' + data.error;
+              mensaje.style.color = 'red';
+          }
+      } catch (error) {
+          console.error('Error:', error);
+      }
+  });
+</script>

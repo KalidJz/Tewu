@@ -1,0 +1,74 @@
+.main-content {
+    min-height: 300px;
+    padding: 20px;
+    background-color: #f9f9f9; /* Fondo claro para mejor contraste */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+a {
+    text-decoration: none;
+    color: white;
+    transition: color 0.3s; /* Transición suave al cambiar el color */
+}
+
+a:hover {
+    color: #ffffff; /* Cambio de color al pasar el ratón */
+}
+
+button {
+    background-color: #000000; /* Color azul profesional */
+    color: #fff;
+    border: none;
+    padding: 12px 18px; /* Espaciado más amplio */
+    font-size: 16px;
+    border-radius: 6px; /* Bordes más redondeados */
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease; /* Transición en fondo y transformación */
+    margin: 8px; /* Espaciado entre botones */
+    display: inline-block;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra para el botón */
+}
+
+button:hover {
+    background-color: #2f3443; /* Azul más oscuro al pasar el ratón */
+    transform: translateY(-2px); /* Efecto de elevación al pasar el ratón */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* Intensifica la sombra */
+}
+
+button:active {
+    transform: translateY(0); /* Regresa a la posición original al hacer clic */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra reducida */
+}
+
+.button-container {
+    display: flex; /* Usar Flexbox para alinear los elementos */
+    justify-content: center; /* Centrar horizontalmente */
+    flex-wrap: wrap; /* Permitir ajuste en varias líneas si es necesario */
+    margin-top: 20px;
+    gap: 12px; /* Espaciado uniforme entre botones */
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    .content {
+        margin-left: 0;
+        padding: 15px; /* Reducir el padding en pantallas pequeñas */
+    }
+    button {
+        font-size: 14px; /* Botones más pequeños en pantallas móviles */
+        padding: 10px 14px; /* Ajustar tamaño en dispositivos móviles */
+    }
+}
+
+@media (max-width: 480px) {
+    .button-container {
+        flex-direction: column; /* Botones en columna en pantallas muy pequeñas */
+        align-items: center; /* Centrar botones verticalmente */
+    }
+}
